@@ -1,0 +1,25 @@
+{
+  "name": "vcu-covid19",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rasha-hantash/vcu-covid19.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rasha-hantash/vcu-covid19/issues"
+  },
+  "homepage": "https://github.com/rasha-hantash/vcu-covid19#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "password-generator": "^2.2.3"
+  }
+}
