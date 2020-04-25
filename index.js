@@ -4,6 +4,17 @@ const generatePassword = require('password-generator');
 
 const app = express();
 
+// const dotenv = require('dotenv');
+// dotenv.config();
+require('dotenv').config();
+
+
+// var cors = require('cors');
+// app.use(cors());
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
 
@@ -20,6 +31,40 @@ app.get('/api/passwords', (req, res) => {
   res.json(passwords);
 
   console.log(`Sent ${count} passwords`);
+});
+
+app.post('/getMaskRecords', (req, res) => {
+    console.log("The request",req.body.maskID);
+    // console.log("The json.maskID",req.body.maskID);
+    // let maskID = req.body.maskID;
+    // console.log("MASK ID", maskID);
+    let Airtable = require('airtable');
+    let base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_KEY);
+    // filterByFormula: 'Find("${my_name}", Mask)'
+    //1000002
+    var filter = "Find(\""+  `${req.body.maskID}` +"\""  + ", Mask)";
+    //'Find("1000002", Mask)'
+    console.log("Filter", filter);
+    base('Mask Uses').select({
+        view: "Grid view",
+        filterByFormula: filter
+    }).eachPage(function page(records, fetchNextPage) {
+        res.json(records);
+        records.forEach(function (record) {;
+            if(record.get('Mask') == "1000002"){
+                console.log('Retrieved', record.get('Name') + " " + record.get("Mask Uses")); 
+            }
+            //  
+        });
+
+        // To fetch the next page of records, call `fetchNextPage`.
+        // If there are more records, `page` will get called again.
+        // If there are no more records, `done` will get called.
+        fetchNextPage();
+
+    }, function done(err) {
+        if (err) { console.error(err); return; }
+    });
 });
 
 // The "catchall" handler: for any request that doesn't
