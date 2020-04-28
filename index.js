@@ -74,7 +74,7 @@ app.post('/addNewStaff', (req, res) => {
   console.log(process.env);
   
  
-  var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY}).base(process.env.REACT_APP_AIRTABLE_BASE_KEY);
+  var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY}).base(process.env.REACT_APP_API_AIRTABLE_BASE);
   console.log(base);
   console.log(base);
   //     name,
@@ -87,7 +87,7 @@ app.post('/addNewStaff', (req, res) => {
     {
       "fields": {
         "Name": req.body.name,
-        "Phone Number": "(123) 456-7890",
+        "Phone Number": req.body.textmask,
         "Building/Floor/Unit": [
           "recRJH04JrjkSoFF5"
         ],
