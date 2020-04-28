@@ -1,6 +1,7 @@
 import React from 'react';
 // import '../App.css';
 import { Col, Row, Button, Form, FormGroup, Label, Input } from 'reactstrap';
+
 class UpdateMask extends React.Component {
     updateMask() { }
 

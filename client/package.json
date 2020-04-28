@@ -4,6 +4,8 @@
   "private": true,
   "proxy": "http://localhost:5000",
   "dependencies": {
+    "@material-ui/core": "^4.9.11",
+    "@material-ui/icons": "^4.9.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -11,12 +13,15 @@
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
     "css-loader": "^3.5.3",
+    "quagga": "^0.12.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
+    "react-text-mask": "^5.4.3",
     "reactstrap": "^8.4.1",
-    "style-loader": "^1.2.0"
+    "style-loader": "^1.2.0",
+    "typeface-roboto": "0.0.75"
   },
   "scripts": {
     "start": "react-scripts start",
