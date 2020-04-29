@@ -1,38 +1,24 @@
 import React from 'react';
 import '../App.css';
-import { Container, Button, TextField, InputLabel, MenuItem,  Select,  Input } from '@material-ui/core';
-import { withStyles } from "@material-ui/core/styles";
+import { Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl } from '@material-ui/core';
+import { withStyles, makeStyles } from "@material-ui/core/styles";
 import MaskedInput from 'react-text-mask';
 import PropTypes from "prop-types";
 import Scanner from './BarcodeScanner/Scanner'
 import axios from 'axios';
+import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
+import { useHistory } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import AddStaffResult from './AddStaffResult';
+import { withRouter } from 'react-router-dom';
 
-// const useStyles = makeStyles(theme => ({
-//     marginAutoContainer: {
-//         display: 'flex',
-//         backgroundColor: 'gold',
-//         margin: 'auto 0',
-//         justifyContent: 'center',
-//     },
-//     marginAutoItem: {
-//         margin: 'auto'
-//     },
-//     alignItemsAndJustifyContent: {
-//         width: 500,
-//         height: 80,
-//         display: 'flex',
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//         backgroundColor: 'pink',
-//     },
-// }))
-//   reateNewMask() { }
-const styles = {
+
+const styles = theme => ({
   marginAutoContainer: {
-    display: 'flex',
-    backgroundColor: 'gold',
-    margin: 'auto 0',
-    justifyContent: 'center',
+    height: "50%",
+    padding: "2vw",
+    textAlign: "center",
+    
   },
   marginAutoItem: {
     margin: 'auto'
@@ -45,7 +31,29 @@ const styles = {
     justifyContent: 'center',
     backgroundColor: 'pink',
   },
-};
+  root: {
+    // '& .MuiTextField-root': {
+    //   margin: theme.spacing(1),
+    // },
+  
+    width: "40%",
+    ['@media (max-width:600px)']: { // mobile devices
+      marginLeft: "2%",
+      width: "95%"
+
+    },
+
+    ['@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait)']: //ipad
+    {
+      marginLeft: "2%",
+      width: "95%",
+      fontSize: "30px",
+    },
+  }
+});
+
+
+
 function TextMaskCustom(props) {
   const { inputRef, ...other } = props;
 
@@ -70,23 +78,20 @@ class AddStaff extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: "",
+      firstname: "",
+      lastname: "",
+      email: "",
       barcode: "",
       department: "",
       textmask: '(  )    -    ',
       scanning: false,
       lastresult: [],
-
+      
     };
-    // this.handlePhoneChange = this.handlePhoneChange.bind(this);
+    this.addNewStaff = this.addNewStaff.bind(this);
+    
   }
-  //   handlePhoneChange(value) {
-  //     if (value) {
-  //       this.setState({ phone: value });
-  //     }
-  //   }
-
-  ///////////logic for scanning
+  
   _scan = () => {
     this.setState({ scanning: !this.state.scanning })
   }
@@ -98,9 +103,8 @@ class AddStaff extends React.Component {
     if (this.state.lastresult.length >= 20) {
       this._logResults();
       this.setState({ ...this.state, scanning: false })
-      // this.state.scanning = false;
       console.log("This is your state", this.state);
-      
+
     }
   }
   _logResults = () => {
@@ -110,15 +114,15 @@ class AddStaff extends React.Component {
   }
 
   //return the barcode that occured the most during the scan
-  _orderByOccurance = (arr) =>{
+  _orderByOccurance = (arr) => {
     var counts = {};
-    arr.forEach(function(value){
-      if(!counts[value]){
+    arr.forEach(function (value) {
+      if (!counts[value]) {
         counts[value] = 0;
       }
       counts[value]++;
     });
-    return Object.keys(counts).sort(function(curKey,nextKey){
+    return Object.keys(counts).sort(function (curKey, nextKey) {
       return counts[curKey] < counts[nextKey];
     });
   }
@@ -134,64 +138,125 @@ class AddStaff extends React.Component {
   };
 
   async addNewStaff() {
-  
+
     console.log("This is the state", this.state)
-    const { name,
-    barcode,
-    department,
-    textmask,
-    scanning,
-    lastresult} = this.state;
+    const { firstname,
+      lastname,
+      email,
+      barcode,
+      department,
+      textmask,
+      scanning,
+      lastresult } = this.state;
 
     const staffInformation = {
-      name,
+      firstname,
+      lastname,
+      email,
       barcode,
       department,
       textmask,
       scanning,
       lastresult
     };
-    console.log("Mask record", staffInformation);
-
+    const fullname = this.state.firstname + " " + this.state.lastname;
+    this.props.history.push({
+      pathname: '/staff/add/result',
+      state: staffInformation
+  });
     let response = await axios.post('/addNewStaff', staffInformation);
-    console.log(response.data);
-    this.setState({ records: response.data});
+
+    
+    if (response) {
+      const type = await response.json();
+      console.log('Login status:');
+      
+  } else {
+      console.error('Login Failed!');
+  }
+    // });//.then(() => {
+      // if(!response.error){
+      //   c
+      //  }
+      
+      
+        //   this.setState({ records: response.data });
+    //   
+    
+    // history.push('/staff/add/result', { fullname: fullname });
+    // });
+    // console.log(response.data);
+    
 
     // maybe create a this.staff.records variable
     console.log("These are records", this.state.records);
+    
 
-}
+  }
+
   render() {
+    const { classes } = this.props;
+    
     return (
-      <Container maxWidth="lg">
+      <Container className={classes.marginAutoContainer}>
         <form noValidate autoComplete="off" >
-          <TextField required
-            id="standard-full-width" 
-            name="name"
-            onChange={event => this.handleChange(event)} 
-            style={{ width: "40%", marginBottom: "1%" }} 
-            placeholder="Enter First and Last Name" 
-            label="Required" 
+          <TextField required className={classes.root}
+            id="standard-full-width"
+            name="firstname"
+            onChange={event => this.handleChange(event)}
+            // style={{ marginBottom: "1%", marginLeft: "2%" }}
+            placeholder="Enter First"
+            label="Required"
+            InputLabelProps={{
+              shrink: true,
+            }} />
+        </form>
+        <form>
+          <TextField required className={classes.root}
+            id="standard-full-width"
+            name="lastname"
+            onChange={event => this.handleChange(event)}
+            // style={{ marginBottom: "1%", marginLeft: "2%" }}
+            placeholder="Enter Last Name"
+            label="Required"
             InputLabelProps={{
               shrink: true,
             }} />
         </form>
         <form noValidate autoComplete="off" >
-          <TextField required
-            id="standard-full-width" 
-            name="barcode" 
+          <TextField required className={classes.root}
+            id="standard-full-width"
+            name="email"
+            onChange={event => this.handleChange(event)}
+            // style={{ width: "40%", marginBottom: "1%" }}
+            placeholder="Enter email"
+            label="Required"
+            InputLabelProps={{
+              shrink: true,
+            }} />
+        </form>
+        <form noValidate autoComplete="off" >
+          <TextField required className={classes.root}
+            id="standard-full-width"
+            name="barcode"
             value={this.state.barcode}
-            onChange={event => this.handleChange(event)} 
-            style={{ width: "40%", marginBottom: "1%" }} 
-            placeholder="Scan Staff Barcode" label="Required" 
+            onChange={event => this.handleChange(event)}
+            // style={{ width: "40%", marginBottom: "1%" }}
+            placeholder="Scan Staff Barcode" label="Required"
+            InputProps={{
+              endAdornment: <InputAdornment position="end"><IconButton onClick={this._scan}><CenterFocusWeakOutlinedIcon>
+
+              </CenterFocusWeakOutlinedIcon></IconButton>
+              </InputAdornment>,
+            }}
             InputLabelProps={{
               shrink: true,
-            }} />
-          <Button color="primary" variant="outlined" onClick={this._scan}>Scan</Button>
+
+            }}>
+          </TextField>
 
         </form>
-
-        <form >
+        <FormControl className={classes.root} noValidate autoComplete="off">
           <InputLabel required shrink id="demo-simple-select-placeholder-label-label">Department</InputLabel>
           <Select
             name="department"
@@ -202,31 +267,36 @@ class AddStaff extends React.Component {
             // value={Phone}
             // onChange={this.handlePhoneChange}
             displayEmpty
-            // className={classes.selectEmpty}
-            style={{ width: "40%", marginBottom: "1%" }}
+          // className={classes.selectEmpty}
+
           >
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
             <MenuItem value={"CH9-STICU"}>CCH9-STICU</MenuItem>
-            <MenuItem value={20}>Twenty</MenuItem>
-            <MenuItem value={30}>Thirty</MenuItem>
+            <MenuItem value={"Main1-ED"}>Main1-ED</MenuItem>
+            <MenuItem value={"CCH11-MRICU"}>CCH11-MRICU</MenuItem>
+            <MenuItem value={"CCH11-NSICU"}>CCH11-NSICU</MenuItem>
+            <MenuItem value={"N9-ICT"}>N9-ICT</MenuItem>
+            <MenuItem value={"Main5-OR"}>Main5-OR</MenuItem>
+            <MenuItem value={"ACC-OR"}>ACC-OR</MenuItem>
+            <MenuItem value={"ACC-Anesthesia"}>ACC-Anesthesia</MenuItem>
           </Select>
           {/* <FormHelperText>Label + placeholder</FormHelperText> */}
-        </form>
-
-        <form>
-          <InputLabel required  htmlFor="formatted-text-mask-input">react-text-mask</InputLabel>
-          <Input
+        </FormControl>
+        <form noValidate autoComplete="off">
+          {/* <InputLabel required shrink id="demo-simple-select-placeholder-label-label">Department</InputLabel> */}
+          <InputLabel required  >Phone number</InputLabel>
+          <Input className={classes.root}
             value={this.state.textmask}
             onChange={event => this.handleChange(event)}
             name="textmask"
             id="formatted-text-mask-input"
             inputComponent={TextMaskCustom}
-            style={{ width: "40%", marginBottom: "1%" }}
+          // style={{ width: "40%", marginBottom: "1%" }}
           />
         </form>
-        <Button color="primary" variant="outlined" onClick={this.addNewStaff.bind(this)}>Add Staff</Button>
+        <Button className={classes.root} style={{ marginTop: "1%" }} color="primary" variant="outlined" onClick={this.addNewStaff.bind(this)}>Add Staff</Button>
         <div>
           {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
         </div>
@@ -235,4 +305,4 @@ class AddStaff extends React.Component {
 
   }
 }
-export default withStyles(styles)(AddStaff);
+export default withRouter((withStyles(styles)(AddStaff)));

@@ -17,21 +17,15 @@ app.use(express.urlencoded({ extended: false }));
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
+let kvArray = [['CCH9-STICU','recQ0l2LfPFDebWQs'], ['Main1-ED', 'recIopo1MrlaIEh2a'], 
+['CCH11-MRICU', 'recJgdeZnX9Oignom'], ['CCH11-NSICU', 'recBGEPiC2Ym1Zdhn'], ['N9-ICT', 'recsRYI8ragfwpKR2'], 
+['Main5-OR', 'recRJH04JrjkSoFF5'], ['ACC-OR', 'rec3TitqxsVHLB6aB'], ['ACC-Anesthesia', 'recvPp6tGJ3WTIe8M']]
 
-// Put all API endpoints under '/api'
-app.get('/api/passwords', (req, res) => {
-  const count = 5;
+// Use the regular Map constructor to transform a 2D key-value Array into a map
+let departmentMap = new Map(kvArray)
 
-  // Generate some passwords
-  const passwords = Array.from(Array(count).keys()).map(i =>
-    generatePassword(12, false)
-  )
+departmentMap.get('key1') // returns "value1"
 
-  // Return them as json
-  res.json(passwords);
-
-  console.log(`Sent ${count} passwords`);
-});
 
 app.post('/getMaskRecords', (req, res) => {
   console.log("The request", req.body.maskID);
@@ -77,19 +71,16 @@ app.post('/addNewStaff', (req, res) => {
   var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY}).base(process.env.REACT_APP_API_AIRTABLE_BASE);
   console.log(base);
   console.log(base);
-  //     name,
-  //     barcode,
-  //     department,
-  //     textmask,
-  //     scanning,
-  //     lastresult
+  let buildingFloorUnit = departmentMap.get(req.body.department);
+  console.log("This is the building floor unit ",  buildingFloorUnit);
   base('Staff').create([
     {
       "fields": {
-        "Name": req.body.name,
+        "Name": req.body.firstname + " " + req.body.lastname,
+        "Email": req.body.email,
         "Phone Number": req.body.textmask,
         "Building/Floor/Unit": [
-          "recRJH04JrjkSoFF5"
+          buildingFloorUnit
         ],
         "Staff Barcode": {"text":req.body.barcode,"type":""},
       }

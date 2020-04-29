@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import AddStaff from './Components/AddStaff';
+import AddStaffResult from './Components/AddStaffResult';
 import AddMask from './Components/AddMask';
 import AssignMaskToUser from './Components/AssignMaskToUser';
 import UpdateMask from './Components/UpdateMask';
@@ -124,7 +125,8 @@ class App extends React.Component {
       <Route />
       <Switch>
         <Route exact path="/" component={MaterialGrid} />
-        <Route path="/staff/add" component={AddStaff} />
+        <Route exact path="/staff/add" component={AddStaff} />
+        <Route path="/staff/add/result" render={props => <AddStaffResult {...props}/>} />
         {/* <Route path="/staff/update" component={UpdateStaff} /> */}
         {/* <Route path='/mask/add' component={AddMask} /> */}
         {/* <Route path='/mask/update' component={UpdateMask} /> */}
