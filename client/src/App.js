@@ -6,6 +6,7 @@ import AddMask from './Components/AddMask';
 import AssignMaskToUser from './Components/AssignMaskToUser';
 import UpdateMask from './Components/UpdateMask';
 import UpdateStaff from './Components/UpdateStaff';
+import ViewStaffRecords from './Components/ViewStaffRecords'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
@@ -127,6 +128,7 @@ class App extends React.Component {
         <Route exact path="/" component={MaterialGrid} />
         <Route exact path="/staff/add" component={AddStaff} />
         <Route path="/staff/add/result" render={props => <AddStaffResult {...props}/>} />
+        <Route path="/records" render={props => <ViewStaffRecords {...props}/>} />
         {/* <Route path="/staff/update" component={UpdateStaff} /> */}
         {/* <Route path='/mask/add' component={AddMask} /> */}
         {/* <Route path='/mask/update' component={UpdateMask} /> */}

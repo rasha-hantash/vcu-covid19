@@ -17,8 +17,8 @@ app.use(express.urlencoded({ extended: false }));
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
-let kvArray = [['CCH9-STICU','recQ0l2LfPFDebWQs'], ['Main1-ED', 'recIopo1MrlaIEh2a'], 
-['CCH11-MRICU', 'recJgdeZnX9Oignom'], ['CCH11-NSICU', 'recBGEPiC2Ym1Zdhn'], ['N9-ICT', 'recsRYI8ragfwpKR2'], 
+let kvArray = [['CCH9-STICU', 'recQ0l2LfPFDebWQs'], ['Main1-ED', 'recIopo1MrlaIEh2a'],
+['CCH11-MRICU', 'recJgdeZnX9Oignom'], ['CCH11-NSICU', 'recBGEPiC2Ym1Zdhn'], ['N9-ICT', 'recsRYI8ragfwpKR2'],
 ['Main5-OR', 'recRJH04JrjkSoFF5'], ['ACC-OR', 'rec3TitqxsVHLB6aB'], ['ACC-Anesthesia', 'recvPp6tGJ3WTIe8M']]
 
 // Use the regular Map constructor to transform a 2D key-value Array into a map
@@ -45,7 +45,7 @@ app.post('/getMaskRecords', (req, res) => {
   }).eachPage(function page(records, fetchNextPage) {
     res.json(records);
     records.forEach(function (record) {
-      ;
+
       if (record.get('Mask') == "1000002") {
         console.log('Retrieved', record.get('Name') + " " + record.get("Mask Uses"));
       }
@@ -66,13 +66,13 @@ app.post('/addNewStaff', (req, res) => {
   console.log("The request", req.body);
   var Airtable = require('airtable');
   console.log(process.env);
-  
- 
-  var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY}).base(process.env.REACT_APP_API_AIRTABLE_BASE);
+
+
+  var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY }).base(process.env.REACT_APP_API_AIRTABLE_BASE);
   console.log(base);
   console.log(base);
   let buildingFloorUnit = departmentMap.get(req.body.department);
-  console.log("This is the building floor unit ",  buildingFloorUnit);
+  console.log("This is the building floor unit ", buildingFloorUnit);
   base('Staff').create([
     {
       "fields": {
@@ -82,10 +82,10 @@ app.post('/addNewStaff', (req, res) => {
         "Building/Floor/Unit": [
           buildingFloorUnit
         ],
-        "Staff Barcode": {"text":req.body.barcode,"type":""},
+        "Staff Barcode": { "text": req.body.barcode, "type": "" },
       }
     }
-  ], function(err, records) {
+  ], function (err, records) {
     if (err) {
       console.error(err);
       return;
@@ -96,6 +96,94 @@ app.post('/addNewStaff', (req, res) => {
   });
 
 });
+
+app.post('/retrieveRecordsFromStaffByBarcode', (req, res) => {
+  console.log("The request", req.body);
+  var Airtable = require('airtable');
+  // console.log(process.env);
+  let result=[];
+  let mask = [];
+  let staff = [];
+  let maskCalled = false;
+  let staffCalled = false;
+  //to fix the issue with the databases being called out of order set boolean vairables
+  var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY }).base(process.env.REACT_APP_API_AIRTABLE_BASE);
+
+  //'Find("barcode_number, Staff)'
+  //have to call Staff send back data and then call Mask
+  //in this order and send back data in this order
+  //for whatever reason
+  //TODO ask AIRTABLE why that is (is it promise related?)
+  base('Staff').select({
+    view: "Main View",
+    filterByFormula: `{Staff Barcode} = "${req.body.barcode}"`
+  }).eachPage(function page(records, fetchNextPage) {
+    // This function (`page`) will get called for each page of records.
+    
+    // staff = records;
+    
+    result[0]= records;
+    console.log("THES RESULT AT 0",result[0]);
+    // result[1]= mask;
+    staffCalled = true;
+    
+    // res.json(result);
+    
+    records.forEach(function (record) {
+      // console.log('Retrieved', record);
+    });
+
+    // To fetch the next page of records, call `fetchNextPage`.
+    // If there are more records, `page` will get called again.
+    // If there are no more records, `done` will get called.
+    fetchNextPage();
+
+  }, function done(err) {
+    if (err) { console.error(err); return; }
+  });
+  // setTimeout(() => {  console.log("World!"); }, 2000);
+
+  base('Masks').select({
+    view: "Main View",
+    filterByFormula: `{User Barcode} = "${req.body.barcode}"`
+  }).eachPage(function page(records, fetchNextPage) {
+    // This function (`page`) will get called for each page of records.
+    result[1] = records;
+    
+    maskCalled = true;
+    // setTimeout(() => {  console.log("World!"); }, 2000);
+    // res.json(result);
+    records.forEach(function (record) {
+    });
+
+    // To fetch the next page of records, call `fetchNextPage`.
+    // If there are more records, `page` will get called again.
+    // If there are no more records, `done` will get called.
+    fetchNextPage();
+
+  }, function done(err) {
+    if (err) { console.error(err); return; }
+  });
+
+  // temprorary fix for result returning before callign the staff table
+  // may need to be longer if we have like 10 masks to one person
+  setTimeout(() => {  console.log("World!");console.log("Timeout result",result);res.json(result); }, 1000);
+  
+  
+
+  
+
+  // console.log("THE RESULT", result);
+  // while(result[0].length != 0 && result[1].length != 0){
+  //   console.log("still empty");
+  // }
+  
+
+  
+});
+
+
+
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
