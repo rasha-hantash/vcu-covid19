@@ -8,7 +8,7 @@ const app = express();
 // dotenv.config();
 require('dotenv').config();
 
-
+const AirtablePlus = require('airtable-plus');
 var cors = require('cors');
 app.use(cors());
 
@@ -98,88 +98,41 @@ app.post('/addNewStaff', (req, res) => {
 });
 
 app.post('/retrieveRecordsFromStaffByBarcode', (req, res) => {
-  console.log("The request", req.body);
-  var Airtable = require('airtable');
-  // console.log(process.env);
-  let result=[];
-  let mask = [];
-  let staff = [];
-  let maskCalled = false;
-  let staffCalled = false;
-  //to fix the issue with the databases being called out of order set boolean vairables
-  var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY }).base(process.env.REACT_APP_API_AIRTABLE_BASE);
 
-  //'Find("barcode_number, Staff)'
-  //have to call Staff send back data and then call Mask
-  //in this order and send back data in this order
-  //for whatever reason
-  //TODO ask AIRTABLE why that is (is it promise related?)
-  base('Staff').select({
-    view: "Main View",
-    filterByFormula: `{Staff Barcode} = "${req.body.barcode}"`
-  }).eachPage(function page(records, fetchNextPage) {
-    // This function (`page`) will get called for each page of records.
-    
-    // staff = records;
-    
-    result[0]= records;
-    console.log("THES RESULT AT 0",result[0]);
-    // result[1]= mask;
-    staffCalled = true;
-    
-    // res.json(result);
-    
-    records.forEach(function (record) {
-      // console.log('Retrieved', record);
-    });
+  
 
-    // To fetch the next page of records, call `fetchNextPage`.
-    // If there are more records, `page` will get called again.
-    // If there are no more records, `done` will get called.
-    fetchNextPage();
-
-  }, function done(err) {
-    if (err) { console.error(err); return; }
-  });
-  // setTimeout(() => {  console.log("World!"); }, 2000);
-
-  base('Masks').select({
-    view: "Main View",
-    filterByFormula: `{User Barcode} = "${req.body.barcode}"`
-  }).eachPage(function page(records, fetchNextPage) {
-    // This function (`page`) will get called for each page of records.
-    result[1] = records;
-    
-    maskCalled = true;
-    // setTimeout(() => {  console.log("World!"); }, 2000);
-    // res.json(result);
-    records.forEach(function (record) {
-    });
-
-    // To fetch the next page of records, call `fetchNextPage`.
-    // If there are more records, `page` will get called again.
-    // If there are no more records, `done` will get called.
-    fetchNextPage();
-
-  }, function done(err) {
-    if (err) { console.error(err); return; }
+  // baseID, apiKey, and tableName can alternatively be set by environment variables
+  const airtable = new AirtablePlus({
+    baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
+    apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
+    tableName: 'Staff',
   });
 
-  // temprorary fix for result returning before callign the staff table
-  // may need to be longer if we have like 10 masks to one person
-  setTimeout(() => {  console.log("World!");console.log("Timeout result",result);res.json(result); }, 1000);
-  
-  
+  console.log(airtable);
 
-  
+  (async () => {
+    try {
+      const cfg = { tableName: 'Masks' };
+      const maskRes = await airtable.read({
+        filterByFormula: `{User Barcode} = "${req.body.barcode}"`
+      }, cfg);
+      
+      const staffRes = await airtable.read({
+        filterByFormula: `{Staff Barcode} = "${req.body.barcode}"`
+      });
 
-  // console.log("THE RESULT", result);
-  // while(result[0].length != 0 && result[1].length != 0){
-  //   console.log("still empty");
-  // }
-  
+      let result = [];
+      result[0] = staffRes;
+      result[1] = maskRes;
+      console.log("this is result[0]: ", result[0]);
+      console.log("this is result[1] ", result[1]);
+      res.json(result);
 
-  
+    }
+    catch (e) {
+      console.error(e);
+    }
+  })();
 });
 
 

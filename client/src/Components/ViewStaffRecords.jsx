@@ -125,8 +125,8 @@ class ViewStaffRecords extends React.Component {
         return (
 
 
-            <Container style={{ marginTop: "15%" }}>
-                <HideOnScroll style={{ marginBottom: "50%" }} {...this.props} >
+            <Container>
+                <HideOnScroll  {...this.props} >
                     <AppBar >
                         <Toolbar>
 
@@ -136,7 +136,7 @@ class ViewStaffRecords extends React.Component {
                         </Toolbar>
                     </AppBar>
                 </HideOnScroll>
-                <Typography variant="h5" component="h2" style={{ paddingTop: "3%" }}>
+                <Typography variant="h5" component="h2" style={{ paddingTop: "20%" }}>
                     Staff
                     </Typography>
                 <Card className={classes.root} style={{ marginBottom: '2%', cursor: "pointer" }} variant="outlined">
