@@ -75,15 +75,66 @@ function HideOnScroll(props) {
 
 class ViewStaffRecords extends React.Component {
 
+    // getInitialState() {
+    //     return {
+    //         staffRecord: [],
+    //         maskRecords: [],
+            
+    //     };
+    // }
+    // state = this.getInitialState();
+
+    // do something like this.sate = {
+        
+    // }
     constructor(props) {
         super(props);
         this.state = {
-            staffRecord: [],
-            maskRecords: [],
+            staffRecord: [{
+                fields: {
+                    Name: '',
+                    Email: '',
+                    ['Staff Barcode']: '',
+                    ['Building/Floor Code']: '',
+                    ['Unit Code']: '',
+                    ['Phone Number']: ''
+                }
+            }],
+            maskRecords: []
 
         }
-        this.returnAddStaff = this.returnAddStaff.bind(this);
+        // this.returnAddStaff = this.returnAddStaff.bind(this);
+        // this.updateStaff = this.updateStaff.bind(this);
     };
+
+    componentDidMount() {
+       
+        // this.loadData();
+      }
+
+      loadData() {
+         // this.setState(this.getInitialState());
+         console.log("props in mount", this.props.location.state);
+         this.state.staffRecord = this.props;
+         console.log("this.state ", this.state);
+         // console.log("this is barcode", this.state);
+        //  this.loadData();
+        //  axios.post('/retrieveRecordsFromStaffByBarcode', this.props.location.state.staffInformation).
+        //  then(res => {
+        //      // console.log(res);
+        //      console.log("res in compoment will mount", res.data[0]);
+        //      // console.log("res outside", res.data[1]);
+        //      this.state.staffRecord= [...res.data[0]];//, maskRecords: res});
+        //      console.log("state in mount", this.state.staffRecord[0].fields);
+        //  //     const messages = result.data
+        //  // console.log("COMPONENT WILL Mount messages : ", messages);
+        //  // this.setState({ 
+        //  //   messages: [ ...messages.content ] 
+        //  // })
+        //  });
+      }
+
+    
 
     registerMaskToUser = () => {
 
@@ -115,13 +166,37 @@ class ViewStaffRecords extends React.Component {
         });
     }
 
+    updateStaff ()  {
+        console.log("here")
+        // this.props.history.push({
+        //     pathname: '/staff/update',
+        //     state: {
+        //         firstname: this.props.location.state.staffRecord[0].fields.Name.split(" ")[0],
+        //         lastname : this.props.location.state.staffRecord[0].fields.Name.split(" ")[1],
+        //         email: this.props.location.state.staffRecord[0].fields.Email,
+        //         barcode: this.props.location.state.staffRecord[0].fields['Staff Barcode'].text,
+        //         department: this.props.location.state.staffRecord[0].fields['Building/Floor Code'][0] 
+        //                 + '-' + this.props.location.state.staffRecord[0].fields['Unit Code'][0],
+        //         textmask: this.props.location.state.staffRecord[0].fields['Phone Number'],
+        //         scanning: false,
+        //         lastresult: []
+        //     }
+        // });
+    }
+
 
 
     render() {
 
         const { classes } = this.props;
-        console.log("props", this.props);
+        // console.log("props", this.props);
+        // if(!this.state.staffRecord){
+        //     return <div>Loading...</div>
+        // }
+        console.log("state in render", this.state)
+        console.log(this.props);
         const bull = <span className={classes.bullet}>•</span>;
+
         return (
 
 
@@ -141,15 +216,15 @@ class ViewStaffRecords extends React.Component {
                     </Typography>
                 <Card className={classes.root} style={{ marginBottom: '2%', cursor: "pointer" }} variant="outlined">
 
-                    <Typography color="textSecondary" style={{ marginLeft: "1%" }}>
-                        {this.props.location.state.staffRecord[0].fields.Name}
-                        <IconButton >
+                    <Typography  color="textSecondary" style={{ marginLeft: "1%" }}>
+                        {this.state.staffRecord[0].fields.Name}
+                        <IconButton onClick={() => this.updateStaff()}>
                             <EditIcon style={{ justifyContent: 'flexEnd' }}></EditIcon>
                         </IconButton>
-                        <TableCell align="right">{this.props.location.state.staffRecord[0].fields.Email}</TableCell>
-                        <TableCell align="right">{this.props.location.state.staffRecord[0].fields['Phone Number']}</TableCell>
-                        <TableCell align="right">{this.props.location.state.staffRecord[0].fields['Staff Barcode'].text}</TableCell>
-                        <TableCell align="right">{this.props.location.state.staffRecord[0].fields['Mask Type']}</TableCell>
+                        {/* <TableCell align="right">{this.state.staffRecord[0].fields.Email}</TableCell>
+                        <TableCell align="right">{this.state.staffRecord[0].fields['Phone Number']}</TableCell>
+                        <TableCell align="right">{this.staffRecord[0].fields['Staff Barcode'].text}</TableCell>
+                        <TableCell align="right">{this.state.staffRecord[0].fields['Mask Type']}</TableCell> */}
                     </Typography>
                 </Card>
 
@@ -163,7 +238,7 @@ class ViewStaffRecords extends React.Component {
                     Mask
                     </Typography>
                 <div>
-                    {this.props.location.state.maskRecords.map((maskRecord, index) =>
+                    {this.state.maskRecords.map((maskRecord, index) =>
                         <Card variant="outlined">
                             <div>
                                 {console.log(index)}

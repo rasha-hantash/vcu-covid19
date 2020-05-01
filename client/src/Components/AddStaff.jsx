@@ -11,6 +11,8 @@ import { useHistory } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import AddStaffResult from './AddStaffResult';
 import { withRouter } from 'react-router-dom';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+
 
 
 const styles = theme => ({
@@ -18,7 +20,7 @@ const styles = theme => ({
     height: "50%",
     padding: "2vw",
     textAlign: "center",
-    
+
   },
   marginAutoItem: {
     margin: 'auto'
@@ -35,7 +37,7 @@ const styles = theme => ({
     // '& .MuiTextField-root': {
     //   margin: theme.spacing(1),
     // },
-  
+
     width: "40%",
     ['@media (max-width:600px)']: { // mobile devices
       marginLeft: "2%",
@@ -86,12 +88,15 @@ class AddStaff extends React.Component {
       textmask: '(  )    -    ',
       scanning: false,
       lastresult: [],
-      
+
     };
     this.addNewStaff = this.addNewStaff.bind(this);
-    
+    this.backToMain = this.backToMain.bind(this);
+
   }
+
   
+
   _scan = () => {
     this.setState({ scanning: !this.state.scanning })
   }
@@ -163,45 +168,57 @@ class AddStaff extends React.Component {
     this.props.history.push({
       pathname: '/staff/add/result',
       state: staffInformation
-  });
+    });
     let response = await axios.post('/addNewStaff', staffInformation);
 
-    
+
     if (response) {
       const type = await response.json();
       console.log('Login status:');
-      
-  } else {
+
+    } else {
       console.error('Login Failed!');
-  }
+    }
     // });//.then(() => {
-      // if(!response.error){
-      //   c
-      //  }
-      
-      
-        //   this.setState({ records: response.data });
+    // if(!response.error){
+    //   c
+    //  }
+
+
+    //   this.setState({ records: response.data });
     //   
-    
+
     // history.push('/staff/add/result', { fullname: fullname });
     // });
     // console.log(response.data);
-    
+
 
     // maybe create a this.staff.records variable
     console.log("These are records", this.state.records);
+
     
 
+  }
+
+  async backToMain() {
+      this.props.history.push('/');
   }
 
   render() {
     const { classes } = this.props;
     console.log(this.props);
     console.log(this.state);
-    
+
     return (
       <Container className={classes.marginAutoContainer}>
+
+        <IconButton style={{marginRight: '38%'}} onClick={this.backToMain}>
+          <ArrowBackIcon></ArrowBackIcon>
+        </IconButton>
         <form noValidate autoComplete="off" >
+
+
+
           <TextField required className={classes.root}
             id="standard-full-width"
             name="firstname"
@@ -275,7 +292,7 @@ class AddStaff extends React.Component {
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
-            <MenuItem value={"CH9-STICU"}>CCH9-STICU</MenuItem>
+            <MenuItem value={"CCH9-STICU"}>CCH9-STICU</MenuItem>
             <MenuItem value={"Main1-ED"}>Main1-ED</MenuItem>
             <MenuItem value={"CCH11-MRICU"}>CCH11-MRICU</MenuItem>
             <MenuItem value={"CCH11-NSICU"}>CCH11-NSICU</MenuItem>

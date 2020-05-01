@@ -64,22 +64,25 @@ export const MaterialGrid = () => {
   return (<Container className={classes.container}>
     <div>
       <Grid container spacing={2}>
+      <Grid item xs={6} md={6}>
+          <Paper className={classes.paper} style={{ whiteSpace: 'normal' }} type='button'
+            onClick={() => { history.push('/mask/add') }}>Add a new mask</Paper>
+        </Grid>
         <Grid item xs={6} md={6}>
           <Paper className={classes.paper} style={{ whiteSpace: 'normal' }} type='button'
             onClick={() => { history.push('/staff/add') }}>Add a new healthcare worker</Paper>
         </Grid>
         <Grid item xs={6} md={6}>
           <Paper className={classes.paper} style={{ whiteSpace: 'normal' }} type='button'
-            onClick={() => { history.push('/staff/update') }}>Update healthcare worker information</Paper>
-        </Grid>
-        <Grid item xs={6} md={6}>
-          <Paper className={classes.paper} style={{ whiteSpace: 'normal' }} type='button'
-            onClick={() => { history.push('/mask/add') }}>Add a new mask</Paper>
-        </Grid>
-        <Grid item xs={6} md={6}>
-          <Paper className={classes.paper} style={{ whiteSpace: 'normal' }} type='button'
             onClick={() => { history.push('/mask/update') }}>Update mask information</Paper>
         </Grid>
+        <Grid item xs={6} md={6}>
+      
+          <Paper className={classes.paper} style={{ whiteSpace: 'normal' }} type='button'
+            onClick={() => { history.push('/staff/update') }}>Update healthcare worker information</Paper>
+        </Grid>
+        
+        
         <Grid item xs={6} md={6}>
           <Paper className={classes.paper} style={{ whiteSpace: 'normal' }} type='button'
             onClick={() => { history.push('/mask/assignMask') }}>Register mask to healthcare worker</Paper>
@@ -128,9 +131,9 @@ class App extends React.Component {
         <Route exact path="/" component={MaterialGrid} />
         <Route exact path="/staff/add" component={AddStaff} />
         <Route path="/staff/add/result" render={props => <AddStaffResult {...props}/>} />
-        <Route path="/records" render={props => <ViewStaffRecords {...props}/>} />
-        {/* <Route path="/staff/update" component={UpdateStaff} /> */}
-        {/* <Route path='/mask/add' component={AddMask} /> */}
+        <Route path="/staff/records" render={props => <ViewStaffRecords {...props}/>} />
+        <Route path="/staff/update" render={props => <ViewStaffRecords {...props}/>}  />
+        <Route path='/mask/add' render={props => <AddMask {...props}/>} />
         {/* <Route path='/mask/update' component={UpdateMask} /> */}
         {/* <Route path='/mask/assignMask' component={AssignMaskToUser} /> */} */}
       </Switch>

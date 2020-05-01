@@ -97,6 +97,35 @@ app.post('/addNewStaff', (req, res) => {
 
 });
 
+
+app.post('/addNewMask', (req, res) => {
+  console.log("The request", req.body);
+  var Airtable = require('airtable');
+  // console.log(process.env);
+  var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY }).base(process.env.REACT_APP_API_AIRTABLE_BASE);
+
+  let unitCode = departmentMap.get(req.body.department);
+  base('Masks').create([
+    {
+      "fields": {
+        "Mask Barcode": { "text": req.body.mask_barcode, "type": "" },
+        "Unit Code": [unitCode],
+        "Sterilize Cycles": 0,
+        "Mask Type": "3D-printed"
+      }
+    }
+  ], function(err, records) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    records.forEach(function (record) {
+      console.log(record.getId());
+    });
+  });
+
+});
+
 app.post('/retrieveRecordsFromStaffByBarcode', (req, res) => {
 
   
@@ -108,7 +137,7 @@ app.post('/retrieveRecordsFromStaffByBarcode', (req, res) => {
     tableName: 'Staff',
   });
 
-  console.log(airtable);
+  console.log(req.body);
 
   (async () => {
     try {

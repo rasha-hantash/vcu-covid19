@@ -86,17 +86,14 @@ class AddStaffResult extends React.Component {
             lastresult
           };
         
-        await axios.post('/retrieveRecordsFromStaffByBarcode', staffInformation)
-        .then(res => {
-            // const persons = res.data;
-            // this.setState({ persons });
-            console.log("This is res.data" ,res.data);
-            this.props.history.push({
-                pathname: '/records', 
-                state:{ staffRecord: res.data[0], maskRecords: res.data[1]}
-                });
-            
-        });
+        let res = await axios.post('/retrieveRecordsFromStaffByBarcode', staffInformation);
+        console.log("res in addstaffresult outside", res);
+          this.props.location.state = res[0];
+          this.props.location.state= res[1];
+        this.props.history.push({
+            pathname: '/staff/records', 
+            state:{ staffRecord:res[0], maskRecords: res[1]}
+            });
 
 
         
