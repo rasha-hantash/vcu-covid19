@@ -186,7 +186,7 @@ class AssignMask extends React.Component {
                     </Select>
                 </FormControl>
                 <form></form>
-                <Button className={classes.root} style={{ marginTop: "1%" }} color="primary" variant="outlined" onClick={this.addNewMask}>Add Mask</Button>
+                <Button className={classes.root} style={{ marginTop: "1%", color: "white", backgroundColor: "blue" }} color="primary" variant="outlined" onClick={this.addNewMask}>Add Mask</Button>
                 <div>
                     {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
                 </div>

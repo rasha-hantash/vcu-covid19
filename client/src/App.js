@@ -48,8 +48,8 @@ export const MaterialGrid = () => {
   return (
 
     <Container className={classes.container}>
-      <AppBar className={classes.appBar}>
-        <Toolbar>
+      <AppBar style={{ boxShadow: "none" }} className={classes.appBar}>
+        <Toolbar style={{ boxShadow: "none" }}>
           <Typography style={{ margin: '0 auto', textAlign: 'center', fontSize: "25px" }} variant="h6">VCU Mask Interface</Typography>
         </Toolbar>
       </AppBar>

@@ -28,6 +28,9 @@ const styles = (theme) => ({
     },
     root: {
 
+        marginTop: '1em', 
+        marginBottom: '1em',
+
         width: "40%",
         ['@media (max-width:600px)']: { // mobile devices
             marginLeft: "2%",
@@ -54,7 +57,6 @@ class UpdateMask extends React.Component {
             lastresult: [],
         };
 
-        this.addNewMask = this.addNewMask.bind(this);
         this.backToMain = this.backToMain.bind(this);
     }
 
@@ -186,7 +188,7 @@ class UpdateMask extends React.Component {
                     </Select>
                 </FormControl>
                 <form></form>
-                <Button className={classes.root} style={{ marginTop: "1%" }} color="primary" variant="outlined" onClick={this.addNewMask}>Add Mask</Button>
+                <Button className={classes.root} style={{ marginTop: "1%", color: "white", backgroundColor: "blue" }} color="primary" variant="outlined">Update Mask</Button>
                 <div>
                     {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
                 </div>

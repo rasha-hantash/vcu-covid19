@@ -31,6 +31,9 @@ const styles = (theme) => ({
   },
   root: {
 
+    marginTop: '1em', 
+    marginBottom: '1em',
+
     width: "40%",
     ['@media (max-width:600px)']: { // mobile devices
       marginLeft: "2%",
@@ -44,7 +47,8 @@ const styles = (theme) => ({
       width: "95%",
       fontSize: "30px",
     },
-  }
+  },
+  
 });
 
 function TextMaskCustom(props) {
@@ -124,6 +128,8 @@ class UpdateStaff extends React.Component {
           </TextField>
 
         </form>
+        <br />
+        <br />
         <form noValidate autoComplete="off" >
           <TextField required className={classes.root}
             id="standard-full-width"
@@ -160,27 +166,6 @@ class UpdateStaff extends React.Component {
               shrink: true,
             }} />
         </form>
-        <form noValidate autoComplete="off" >
-          <TextField required className={classes.root}
-            id="standard-full-width"
-            name="barcode"
-            value={this.state.barcode}
-            onChange={event => this.handleChange(event)}
-            // style={{ width: "40%", marginBottom: "1%" }}
-            placeholder="Scan Staff Barcode" label="Required"
-            InputProps={{
-              endAdornment: <InputAdornment position="end"><IconButton onClick={this._scan}><CenterFocusWeakOutlinedIcon>
-
-              </CenterFocusWeakOutlinedIcon></IconButton>
-              </InputAdornment>,
-            }}
-            InputLabelProps={{
-              shrink: true,
-
-            }}>
-          </TextField>
-
-        </form>
         <FormControl className={classes.root} noValidate autoComplete="off">
           <InputLabel required shrink id="demo-simple-select-placeholder-label-label">Department</InputLabel>
           <Select
@@ -193,11 +178,8 @@ class UpdateStaff extends React.Component {
             // onChange={this.handlePhoneChange}
             displayEmpty
           // className={classes.selectEmpty}
-
           >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
+            <MenuItem value=""><em>None</em></MenuItem>
             <MenuItem value={"CH9-STICU"}>CCH9-STICU</MenuItem>
             <MenuItem value={"Main1-ED"}>Main1-ED</MenuItem>
             <MenuItem value={"CCH11-MRICU"}>CCH11-MRICU</MenuItem>
@@ -221,7 +203,7 @@ class UpdateStaff extends React.Component {
           // style={{ width: "40%", marginBottom: "1%" }}
           />
         </form>
-        <Button className={classes.root} style={{ marginTop: "1%" }} color="primary" variant="outlined">Add Staff</Button>
+        <Button className={classes.root} style={{ marginTop: "1%", color: "white", backgroundColor: "blue" }} color="primary" variant="outlined">Add Staff</Button>
         <div>
           {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
         </div>
