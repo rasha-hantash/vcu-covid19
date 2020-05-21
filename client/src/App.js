@@ -26,7 +26,8 @@ const styles = {
     background: '#FFBA00',
     textAlign: "center",
     margin: '0 auto',
-    borderRadius: '20px',
+    borderRadius: '25px',
+    boxShadow: 'none',
     // palette:  { 
     //   text: {
     //       primary: "#ffffff",
