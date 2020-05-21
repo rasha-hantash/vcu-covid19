@@ -53,7 +53,7 @@ export const MaterialGrid = () => {
           <div style={{fontWeight:'bolder'}}>Add a new staff</div>
       </CardContent>
     </Card>
-    <Card onClick={() => { history.push('/addMask') }} className={classes.card}>
+    <Card onClick={() => { history.push('/updateStaff') }} className={classes.card}>
       <CardContent style={{marginTop: '5%'}}>
           <div style={{fontWeight:'bolder'}}>Update a staff</div>
       </CardContent>
@@ -63,12 +63,12 @@ export const MaterialGrid = () => {
           <div style={{fontWeight:'bolder'}}>Add a new mask</div>
       </CardContent>
     </Card>
-    <Card onClick={() => { history.push('/addMask') }} className={classes.card}>
+    <Card onClick={() => { history.push('/updateMask') }} className={classes.card}>
       <CardContent style={{marginTop: '5%'}}>
           <div style={{fontWeight:'bolder'}}>Update a mask</div>
       </CardContent>
     </Card>
-    <Card onClick={() => { history.push('/addMask') }} className={classes.card}>
+    <Card onClick={() => { history.push('/registerMaskToUser') }} className={classes.card}>
       <CardContent style={{marginTop: '5%'}}>
           <div style={{fontWeight:'bolder'}}>Register a staff to a mask</div>
       </CardContent>
