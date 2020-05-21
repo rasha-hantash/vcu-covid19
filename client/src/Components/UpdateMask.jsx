@@ -135,29 +135,6 @@ class UpdateMask extends React.Component {
     handleChange = (event) => {
         this.setState({ ...this.state, [event.target.name]: event.target.checked });
     };
-    
-
-    async addNewMask() {
-        console.log("This is the state", this.state)
-        const { mask_barcode,
-            department } = this.state;
-
-        const maskInformation = {
-            mask_barcode,
-            department
-        };
-        let response = await axios.post('/addNewMask', maskInformation);
-
-
-        if (response) {
-            const type = await response.json();
-            console.log('Login status:');
-
-        } else {
-            console.error('Login Failed!');
-        }
-
-    }
 
     async backToMain() {
         this.props.history.push('/');
