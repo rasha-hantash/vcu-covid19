@@ -1,72 +1,108 @@
 import React from 'react';
 import '../App.css';
-import { Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl } from '@material-ui/core';
+import {
+  Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl
+} from '@material-ui/core';
 import MaskedInput from 'react-text-mask';
 import PropTypes from "prop-types";
 import Scanner from './BarcodeScanner/Scanner'
 import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
+import { withStyles } from "@material-ui/core/styles";
 
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 
+const styles = (theme) => ({
+  marginAutoContainer: {
+    height: "50%",
+    padding: "2vw",
+    textAlign: "center",
+
+  },
+  marginAutoItem: {
+    margin: 'auto'
+  },
+  alignItemsAndJustifyContent: {
+    width: 500,
+    height: 80,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'pink',
+  },
+  root: {
+
+    width: "40%",
+    ['@media (max-width:600px)']: { // mobile devices
+      marginLeft: "2%",
+      width: "95%"
+
+    },
+
+    ['@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait)']: //ipad
+    {
+      marginLeft: "2%",
+      width: "95%",
+      fontSize: "30px",
+    },
+  }
+});
 
 function TextMaskCustom(props) {
-    const { inputRef, ...other } = props;
-  
-    return (
-      <MaskedInput
-        {...other}
-        ref={(ref) => {
-          inputRef(ref ? ref.inputElement : null);
-        }}
-        mask={['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-        placeholderChar={'\u2000'}
-        showMask
-      />
-    );
-  }
-  
-  TextMaskCustom.propTypes = {
-    inputRef: PropTypes.func.isRequired,
-  };
+  const { inputRef, ...other } = props;
+
+  return (
+    <MaskedInput
+      {...other}
+      ref={(ref) => {
+        inputRef(ref ? ref.inputElement : null);
+      }}
+      mask={['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
+}
+
+TextMaskCustom.propTypes = {
+  inputRef: PropTypes.func.isRequired,
+};
+
 
 class UpdateStaff extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            firstname: this.props.location.state.firstname,
-            lastname: this.props.location.state.lastname,
-            email: this.props.location.state.email,
-            barcode: this.props.location.state.barcode,
-            department: this.props.location.state.department,
-            textmask: this.props.location.state.testmask,
-            scanning: false,
-            lastresult: []
+  constructor(props) {
+    super(props);
+    this.state = {
+      firstname: "",
+      lastname: "",
+      email: "",
+      barcode: "",
+      department: "",
+      textmask: "",
+      scanning: false,
+      lastresult: [],
+    };
+    this.backToMain = this.backToMain.bind(this);
+  }
 
-        };
-        this.backToViewStaffRecords = this.backToViewStaffRecords.bind(this);
-        // this.retrieveStaffRecord = this.retrieveStaffRecord.bind(this);
+  async backToMain() {
+    this.props.history.push('/');
+  }
 
-    }
+  render() {
+    const { classes } = this.props;
+    console.log('props', this.props);
+    console.log('state', this.state);
 
-    async backToViewStaffRecords() {
-        this.props.history.push({
-            pathname: '/staff/update',
-            state: {
-                staffRecord: this.props.location.state.staffRecord,
-                maskRecords: this.props.location.state.maskRecords
-            }
-        });
-    }
-
-    render() {
-        const { classes } = this.props;
-    console.log(this.props);
-    console.log(this.state);
-    
     return (
+
+      // Step 1 : Search for Staff member to update (Scan BarCode or enter ID)
+      // Step 2 : Fill in field value with their information that's retreived from Airtable API
+      // Step 3 : Let the user edit the information that was added to the screen
+      // Step 4 : When they submit the new information it will be sent to Airtable
+
       <Container className={classes.marginAutoContainer}>
-      <IconButton onClick={this.backToViewStaffRecords}><ArrowBackIosIcon></ArrowBackIosIcon></IconButton>
+        <IconButton onClick={this.backToMain}><ArrowBackIosIcon></ArrowBackIosIcon></IconButton>
         <form noValidate autoComplete="off" >
           <TextField required className={classes.root}
             id="standard-full-width"
@@ -164,13 +200,13 @@ class UpdateStaff extends React.Component {
           // style={{ width: "40%", marginBottom: "1%" }}
           />
         </form>
-        <Button className={classes.root} style={{ marginTop: "1%" }} color="primary" variant="outlined" onClick={this.submitUpdate.bind(this)}>Add Staff</Button>
+        <Button className={classes.root} style={{ marginTop: "1%" }} color="primary" variant="outlined">Add Staff</Button>
         <div>
           {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
         </div>
       </Container>
     )
-    }
+  }
 }
 
-export default UpdateStaff;
+export default withStyles(styles)(UpdateStaff);

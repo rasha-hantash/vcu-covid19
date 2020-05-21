@@ -1,3 +1,4 @@
+
 import React from 'react';
 import '../App.css';
 import { Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl } from '@material-ui/core';
@@ -44,7 +45,7 @@ const styles = (theme) => ({
     }
 });
 
-class UpdateMask extends React.Component {
+class AssignMask extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -133,10 +134,9 @@ class UpdateMask extends React.Component {
         const { classes } = this.props;
         return (
 
-            // Step 1 : Search for mask member to update (Scan BarCode or enter ID)
-            // Step 2 : Fill in field value with their information that's retreived from Airtable API
-            // Step 3 : Let the user edit the information that was added to the screen
-            // Step 4 : When they submit the new information it will be sent to Airtable
+            // Step 1 : Search for staff member (Scan barcode or enter ID)
+            // Step 2 : Search for mask to assign (Scan mask barcode or enter ID)
+            // Step 3 : User hits submit to assign the mask to the staff
 
             <Container className={classes.marginAutoContainer}>
                 <IconButton style={{ marginRight: '38%' }} onClick={this.backToMain}>
@@ -195,4 +195,4 @@ class UpdateMask extends React.Component {
     }
 }
 
-export default withStyles(styles)(UpdateMask);
+export default withStyles(styles)(AssignMask);

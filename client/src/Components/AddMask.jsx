@@ -1,7 +1,9 @@
 import React from 'react';
 import '../App.css';
-import { Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl } from '@material-ui/core';
-import { withStyles} from "@material-ui/core/styles";
+import {
+    Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl
+} from '@material-ui/core';
+import { withStyles } from "@material-ui/core/styles";
 import Scanner from './BarcodeScanner/Scanner'
 import axios from 'axios';
 import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
