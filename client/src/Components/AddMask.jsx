@@ -1,7 +1,19 @@
 import React from 'react';
 import '../App.css';
 import {
-    Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl
+    Container, 
+    Button, 
+    TextField, 
+    InputLabel, 
+    InputAdornment, 
+    IconButton, 
+    MenuItem, 
+    Select, 
+    Input, 
+    FormControl, 
+    Typography,
+    AppBar,
+    Toolbar,
 } from '@material-ui/core';
 import { withStyles } from "@material-ui/core/styles";
 import Scanner from './BarcodeScanner/Scanner'
@@ -30,6 +42,9 @@ const styles = (theme) => ({
     },
     root: {
 
+        marginTop: '1em', 
+        marginBottom: '1em',
+
         width: "40%",
         ['@media (max-width:600px)']: { // mobile devices
             marginLeft: "2%",
@@ -43,7 +58,11 @@ const styles = (theme) => ({
             width: "95%",
             fontSize: "30px",
         },
-    }
+    },
+    appBar: {
+        background: '#FFBA00',
+        color: 'black'
+    },
 });
 
 class AddMask extends React.Component {
@@ -135,9 +154,17 @@ class AddMask extends React.Component {
         const { classes } = this.props;
         return (
             <Container className={classes.marginAutoContainer}>
-                <IconButton style={{ marginRight: '38%' }} onClick={this.backToMain}>
-                    <ArrowBackIcon></ArrowBackIcon>
-                </IconButton>
+                <AppBar style={{ boxShadow: "none" }} className={classes.appBar}>
+                    <Toolbar style={{ boxShadow: "none" }}>
+                        <IconButton className={classes.menuButton} onClick={this.backToMain}>
+                            <ArrowBackIcon></ArrowBackIcon>
+                        </IconButton>
+                        <Typography variant="h6">Add Mask</Typography>
+                    </Toolbar>
+                </AppBar>
+                <br />
+                <br />
+                
                 <form noValidate autoComplete="off" >
                     <TextField required className={classes.root}
                         id="standard-full-width"
@@ -182,7 +209,7 @@ class AddMask extends React.Component {
                     </Select>
                 </FormControl>
                 <form></form>
-                <Button className={classes.root} style={{ marginTop: "1%" }} color="primary" variant="outlined" onClick={this.addNewMask}>Add Mask</Button>
+                <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined" onClick={this.addNewMask}>Add Mask</Button>
                 <div>
                     {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
                 </div>

@@ -1,7 +1,19 @@
 import React from 'react';
 import '../App.css';
 import {
-  Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl
+  Container,
+  Button,
+  TextField,
+  InputLabel, 
+  InputAdornment, 
+  IconButton, 
+  MenuItem, 
+  Select, 
+  Input, 
+  FormControl,
+  Typography,
+  AppBar,
+  Toolbar,
 } from '@material-ui/core';
 import MaskedInput from 'react-text-mask';
 import PropTypes from "prop-types";
@@ -9,7 +21,7 @@ import Scanner from './BarcodeScanner/Scanner'
 import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
 import { withStyles } from "@material-ui/core/styles";
 
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const styles = (theme) => ({
   marginAutoContainer: {
@@ -31,7 +43,7 @@ const styles = (theme) => ({
   },
   root: {
 
-    marginTop: '1em', 
+    marginTop: '1em',
     marginBottom: '1em',
 
     width: "40%",
@@ -48,7 +60,10 @@ const styles = (theme) => ({
       fontSize: "30px",
     },
   },
-  
+  appBar: {
+    background: '#FFBA00',
+    color: 'black'
+  },
 });
 
 function TextMaskCustom(props) {
@@ -106,7 +121,17 @@ class UpdateStaff extends React.Component {
       // Step 4 : When they submit the new information it will be sent to Airtable
 
       <Container className={classes.marginAutoContainer}>
-        <IconButton onClick={this.backToMain}><ArrowBackIosIcon></ArrowBackIosIcon></IconButton>
+        <AppBar style={{ boxShadow: "none" }} className={classes.appBar}>
+          <Toolbar style={{ boxShadow: "none" }}>
+            <IconButton className={classes.menuButton} onClick={this.backToMain}>
+              <ArrowBackIcon></ArrowBackIcon>
+            </IconButton>
+            <Typography variant="h6">Update Staff</Typography>
+          </Toolbar>
+        </AppBar>
+        <br />
+        <br />
+
         <form noValidate autoComplete="off" >
           <TextField required className={classes.root}
             id="standard-full-width"
@@ -203,7 +228,7 @@ class UpdateStaff extends React.Component {
           // style={{ width: "40%", marginBottom: "1%" }}
           />
         </form>
-        <Button className={classes.root} style={{ marginTop: "1%", color: "white", backgroundColor: "blue" }} color="primary" variant="outlined">Add Staff</Button>
+        <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined">Update Staff</Button>
         <div>
           {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
         </div>

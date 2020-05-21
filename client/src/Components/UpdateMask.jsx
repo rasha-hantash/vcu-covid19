@@ -1,7 +1,22 @@
 import React from 'react';
 import '../App.css';
-import { Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl } from '@material-ui/core';
-import { withStyles} from "@material-ui/core/styles";
+import {
+    Container, 
+    Button, 
+    Checkbox, 
+    TextField, 
+    InputLabel, 
+    InputAdornment, 
+    IconButton, 
+    MenuItem, 
+    Select, 
+    Input, 
+    FormControl,
+    Typography,
+    AppBar,
+    Toolbar,
+} from '@material-ui/core';
+import { withStyles } from "@material-ui/core/styles";
 import Scanner from './BarcodeScanner/Scanner'
 import axios from 'axios';
 import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
@@ -28,7 +43,7 @@ const styles = (theme) => ({
     },
     root: {
 
-        marginTop: '1em', 
+        marginTop: '1em',
         marginBottom: '1em',
 
         width: "40%",
@@ -44,7 +59,11 @@ const styles = (theme) => ({
             width: "95%",
             fontSize: "30px",
         },
-    }
+    },
+    appBar: {
+        background: '#FFBA00',
+        color: 'black'
+    },
 });
 
 class UpdateMask extends React.Component {
@@ -141,9 +160,17 @@ class UpdateMask extends React.Component {
             // Step 4 : When they submit the new information it will be sent to Airtable
 
             <Container className={classes.marginAutoContainer}>
-                <IconButton style={{ marginRight: '38%' }} onClick={this.backToMain}>
-                    <ArrowBackIcon></ArrowBackIcon>
-                </IconButton>
+                <AppBar style={{ boxShadow: "none" }} className={classes.appBar}>
+                    <Toolbar style={{ boxShadow: "none" }}>
+                        <IconButton className={classes.menuButton} onClick={this.backToMain}>
+                            <ArrowBackIcon></ArrowBackIcon>
+                        </IconButton>
+                        <Typography variant="h6">Update Mask</Typography>
+                    </Toolbar>
+                </AppBar>
+                <br />
+                <br />
+
                 <form noValidate autoComplete="off" >
                     <TextField required className={classes.root}
                         id="standard-full-width"
@@ -164,6 +191,8 @@ class UpdateMask extends React.Component {
                         }}>
                     </TextField>
                 </form>
+                <br />
+                <br />
 
                 <FormControl className={classes.root} noValidate autoComplete="off">
                     <InputLabel required shrink id="demo-simple-select-placeholder-label-label">Unit Code</InputLabel>
@@ -187,11 +216,19 @@ class UpdateMask extends React.Component {
                         <MenuItem value={"ACC-Anesthesia"}>ACC-Anesthesia</MenuItem>
                     </Select>
                 </FormControl>
-                <form></form>
-                <Button className={classes.root} style={{ marginTop: "1%", color: "white", backgroundColor: "blue" }} color="primary" variant="outlined">Update Mask</Button>
-                <div>
-                    {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
-                </div>
+                <form>
+                    <Checkbox value="increment" inputProps={{ 'label': 'Increment' }} />
+                </form>
+                <form>
+                    <Checkbox value="decrement" inputProps={{ 'label': 'Decrement' }} />
+                </form>
+                <form>
+                    <Checkbox value="decrement" inputProps={{ 'label': 'Destroyed' }} />
+                </form>
+                <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined">Update Mask</Button>
+                    <div>
+                        {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
+                    </div>
             </Container>
         )
     }

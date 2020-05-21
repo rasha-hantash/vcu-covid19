@@ -1,7 +1,21 @@
 import React from 'react';
 import '../App.css';
-import { Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl } from '@material-ui/core';
-import { withStyles} from "@material-ui/core/styles";
+import {
+  Container, 
+  Button, 
+  TextField, 
+  InputLabel, 
+  InputAdornment, 
+  IconButton, 
+  MenuItem, 
+  Select, 
+  Input, 
+  FormControl, 
+  Typography,
+  AppBar,
+  Toolbar,
+} from '@material-ui/core';
+import { withStyles } from "@material-ui/core/styles";
 import MaskedInput from 'react-text-mask';
 import PropTypes from "prop-types";
 import Scanner from './BarcodeScanner/Scanner'
@@ -35,6 +49,9 @@ const styles = theme => ({
     //   margin: theme.spacing(1),
     // },
 
+    marginTop: '1em',
+    marginBottom: '1em',
+
     width: "40%",
     ['@media (max-width:600px)']: { // mobile devices
       marginLeft: "2%",
@@ -48,7 +65,11 @@ const styles = theme => ({
       width: "95%",
       fontSize: "30px",
     },
-  }
+  },
+  appBar: {
+    background: '#FFBA00',
+    color: 'black'
+  },
 });
 
 
@@ -92,7 +113,7 @@ class AddStaff extends React.Component {
 
   }
 
-  
+
 
   _scan = () => {
     this.setState({ scanning: !this.state.scanning })
@@ -193,12 +214,12 @@ class AddStaff extends React.Component {
     // maybe create a this.staff.records variable
     console.log("These are records", this.state.records);
 
-    
+
 
   }
 
   async backToMain() {
-      this.props.history.push('/');
+    this.props.history.push('/');
   }
 
   render() {
@@ -209,9 +230,17 @@ class AddStaff extends React.Component {
     return (
       <Container className={classes.marginAutoContainer}>
 
-        <IconButton style={{marginRight: '38%'}} onClick={this.backToMain}>
-          <ArrowBackIcon></ArrowBackIcon>
-        </IconButton>
+        <AppBar style={{ boxShadow: "none" }} className={classes.appBar}>
+          <Toolbar style={{ boxShadow: "none" }}>
+            <IconButton className={classes.menuButton} onClick={this.backToMain}>
+              <ArrowBackIcon></ArrowBackIcon>
+            </IconButton>
+            <Typography variant="h6">Add Staff</Typography>
+          </Toolbar>
+        </AppBar>
+        <br />
+        <br />
+
         <form noValidate autoComplete="off" >
 
 
@@ -312,7 +341,7 @@ class AddStaff extends React.Component {
           // style={{ width: "40%", marginBottom: "1%" }}
           />
         </form>
-        <Button className={classes.root} style={{ marginTop: "1%" }} color="primary" variant="outlined" onClick={this.addNewStaff.bind(this)}>Add Staff</Button>
+        <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined" onClick={this.addNewStaff.bind(this)}>Add Staff</Button>
         <div>
           {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
         </div>

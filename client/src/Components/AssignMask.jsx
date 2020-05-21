@@ -1,7 +1,21 @@
 
 import React from 'react';
 import '../App.css';
-import { Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl } from '@material-ui/core';
+import { 
+    Container, 
+    Button, 
+    TextField, 
+    InputLabel, 
+    InputAdornment, 
+    IconButton, 
+    MenuItem, 
+    Select, 
+    Input, 
+    FormControl,
+    Typography,
+    AppBar,
+    Toolbar,
+} from '@material-ui/core';
 import { withStyles} from "@material-ui/core/styles";
 import Scanner from './BarcodeScanner/Scanner'
 import axios from 'axios';
@@ -29,6 +43,9 @@ const styles = (theme) => ({
     },
     root: {
 
+        marginTop: '1em',
+        marginBottom: '1em',
+
         width: "40%",
         ['@media (max-width:600px)']: { // mobile devices
             marginLeft: "2%",
@@ -42,7 +59,11 @@ const styles = (theme) => ({
             width: "95%",
             fontSize: "30px",
         },
-    }
+    },
+    appBar: {
+        background: '#FFBA00',
+        color: 'black'
+    },
 });
 
 class AssignMask extends React.Component {
@@ -139,9 +160,17 @@ class AssignMask extends React.Component {
             // Step 3 : User hits submit to assign the mask to the staff
 
             <Container className={classes.marginAutoContainer}>
-                <IconButton style={{ marginRight: '38%' }} onClick={this.backToMain}>
-                    <ArrowBackIcon></ArrowBackIcon>
-                </IconButton>
+                <AppBar style={{ boxShadow: "none" }} className={classes.appBar}>
+                    <Toolbar style={{ boxShadow: "none" }}>
+                        <IconButton className={classes.menuButton} onClick={this.backToMain}>
+                            <ArrowBackIcon></ArrowBackIcon>
+                        </IconButton>
+                        <Typography variant="h6">Assign Mask</Typography>
+                    </Toolbar>
+                </AppBar>
+                <br />
+                <br />
+                
                 <form noValidate autoComplete="off" >
                     <TextField required className={classes.root}
                         id="standard-full-width"
@@ -163,30 +192,27 @@ class AssignMask extends React.Component {
                     </TextField>
                 </form>
 
-                <FormControl className={classes.root} noValidate autoComplete="off">
-                    <InputLabel required shrink id="demo-simple-select-placeholder-label-label">Unit Code</InputLabel>
-                    <Select
-                        name="department"
-                        value={this.state.department}
+                <form noValidate autoComplete="off" >
+                    <TextField required className={classes.root}
+                        id="standard-full-width"
+                        name="mask_barcode"
+                        value={this.state.mask_barcode}
                         onChange={event => this.handleChange(event)}
-                        labelId="demo-simple-select-placeholder-label-label"
-                        id="demo-simple-select-placeholder-label"
-                        displayEmpty>
-                        <MenuItem value="">
-                            <em>None</em>
-                        </MenuItem>
-                        <MenuItem value={"CCH9-STICU"}>CCH9-STICU</MenuItem>
-                        <MenuItem value={"Main1-ED"}>Main1-ED</MenuItem>
-                        <MenuItem value={"CCH11-MRICU"}>CCH11-MRICU</MenuItem>
-                        <MenuItem value={"CCH11-NSICU"}>CCH11-NSICU</MenuItem>
-                        <MenuItem value={"N9-ICT"}>N9-ICT</MenuItem>
-                        <MenuItem value={"Main5-OR"}>Main5-OR</MenuItem>
-                        <MenuItem value={"ACC-OR"}>ACC-OR</MenuItem>
-                        <MenuItem value={"ACC-Anesthesia"}>ACC-Anesthesia</MenuItem>
-                    </Select>
-                </FormControl>
-                <form></form>
-                <Button className={classes.root} style={{ marginTop: "1%", color: "white", backgroundColor: "blue" }} color="primary" variant="outlined" onClick={this.addNewMask}>Add Mask</Button>
+                        // style={{ width: "40%", marginBottom: "1%" }}
+                        placeholder="Scan Mask Barcode" label="Required"
+                        InputProps={{
+                            endAdornment: <InputAdornment position="end"><IconButton onClick={this._scan}><CenterFocusWeakOutlinedIcon>
+
+                            </CenterFocusWeakOutlinedIcon></IconButton>
+                            </InputAdornment>,
+                        }}
+                        InputLabelProps={{
+                            shrink: true,
+
+                        }}>
+                    </TextField>
+                </form>
+                <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined">Assign</Button>
                 <div>
                     {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
                 </div>
