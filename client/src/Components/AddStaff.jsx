@@ -1,15 +1,12 @@
 import React from 'react';
 import '../App.css';
 import { Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl } from '@material-ui/core';
-import { withStyles, makeStyles } from "@material-ui/core/styles";
+import { withStyles} from "@material-ui/core/styles";
 import MaskedInput from 'react-text-mask';
 import PropTypes from "prop-types";
 import Scanner from './BarcodeScanner/Scanner'
 import axios from 'axios';
 import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
-import { useHistory } from 'react-router-dom';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import AddStaffResult from './AddStaffResult';
 import { withRouter } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 

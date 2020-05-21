@@ -17,21 +17,18 @@ app.use(express.urlencoded({ extended: false }));
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
-let kvArray = [['CCH9-STICU', 'recQ0l2LfPFDebWQs'], ['Main1-ED', 'recIopo1MrlaIEh2a'],
+let deptArray = [['CCH9-STICU', 'recQ0l2LfPFDebWQs'], ['Main1-ED', 'recIopo1MrlaIEh2a'],
 ['CCH11-MRICU', 'recJgdeZnX9Oignom'], ['CCH11-NSICU', 'recBGEPiC2Ym1Zdhn'], ['N9-ICT', 'recsRYI8ragfwpKR2'],
 ['Main5-OR', 'recRJH04JrjkSoFF5'], ['ACC-OR', 'rec3TitqxsVHLB6aB'], ['ACC-Anesthesia', 'recvPp6tGJ3WTIe8M']]
 
 // Use the regular Map constructor to transform a 2D key-value Array into a map
-let departmentMap = new Map(kvArray)
+let departmentMap = new Map(deptArray)
 
 departmentMap.get('key1') // returns "value1"
 
 
 app.post('/getMaskRecords', (req, res) => {
   console.log("The request", req.body.maskID);
-  // console.log("The json.maskID",req.body.maskID);
-  // let maskID = req.body.maskID;
-  // console.log("MASK ID", maskID);
   let Airtable = require('airtable');
   let base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_KEY);
   // filterByFormula: 'Find("${my_name}", Mask)'
@@ -49,12 +46,7 @@ app.post('/getMaskRecords', (req, res) => {
       if (record.get('Mask') == "1000002") {
         console.log('Retrieved', record.get('Name') + " " + record.get("Mask Uses"));
       }
-      //  
     });
-
-    // To fetch the next page of records, call `fetchNextPage`.
-    // If there are more records, `page` will get called again.
-    // If there are no more records, `done` will get called.
     fetchNextPage();
 
   }, function done(err) {
@@ -72,7 +64,6 @@ app.post('/addNewStaff', (req, res) => {
   console.log(base);
   console.log(base);
   let buildingFloorUnit = departmentMap.get(req.body.department);
-  console.log("This is the building floor unit ", buildingFloorUnit);
   base('Staff').create([
     {
       "fields": {

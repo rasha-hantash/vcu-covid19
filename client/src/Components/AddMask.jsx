@@ -1,20 +1,14 @@
 import React from 'react';
 import '../App.css';
 import { Container, Button, TextField, InputLabel, InputAdornment, IconButton, MenuItem, Select, Input, FormControl } from '@material-ui/core';
-import { withStyles, makeStyles } from "@material-ui/core/styles";
-import MaskedInput from 'react-text-mask';
-import PropTypes from "prop-types";
+import { withStyles} from "@material-ui/core/styles";
 import Scanner from './BarcodeScanner/Scanner'
 import axios from 'axios';
 import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
-import { useHistory } from 'react-router-dom';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import AddStaffResult from './AddStaffResult';
-import { withRouter } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 
-const styles = theme => ({
+const styles = (theme) => ({
     marginAutoContainer: {
         height: "50%",
         padding: "2vw",
@@ -33,9 +27,6 @@ const styles = theme => ({
         backgroundColor: 'pink',
     },
     root: {
-        // '& .MuiTextField-root': {
-        //   margin: theme.spacing(1),
-        // },
 
         width: "40%",
         ['@media (max-width:600px)']: { // mobile devices
@@ -66,28 +57,6 @@ class AddMask extends React.Component {
         this.addNewMask = this.addNewMask.bind(this);
         this.backToMain = this.backToMain.bind(this);
     }
-    // async getMaskRecord() {
-    //     console.log("Mask id", this.state.maskID);
-    //     const { maskID, records } = this.state;
-
-    //     const maskRecord = {
-    //         maskID,
-    //         records
-    //     };
-    //     console.log("Mask record", maskRecord);
-
-    //     let response = await axios.post('/getMaskRecords', maskRecord);
-    //     console.log(response.data);
-    //     this.setState({ records: response.data });
-
-    //     console.log("These are records", this.state.records);
-
-    //     //   .then(() => console.log('Book Created'))
-    //     //   .catch(err => {
-    //     //     console.error(err);
-    //     //   });
-
-    // }
 
     _scan = () => {
         this.setState({ scanning: !this.state.scanning })
@@ -143,11 +112,6 @@ class AddMask extends React.Component {
             mask_barcode,
             department
         };
-        // const fullname = this.state.firstname + " " + this.state.lastname;
-        // this.props.history.push({
-        //   pathname: '/staff/add/result',
-        //   state: staffInformation
-        // });
         let response = await axios.post('/addNewMask', maskInformation);
 
 
@@ -201,12 +165,7 @@ class AddMask extends React.Component {
                         onChange={event => this.handleChange(event)}
                         labelId="demo-simple-select-placeholder-label-label"
                         id="demo-simple-select-placeholder-label"
-                        // value={Phone}
-                        // onChange={this.handlePhoneChange}
-                        displayEmpty
-                    // className={classes.selectEmpty}
-
-                    >
+                        displayEmpty>
                         <MenuItem value="">
                             <em>None</em>
                         </MenuItem>
@@ -219,29 +178,8 @@ class AddMask extends React.Component {
                         <MenuItem value={"ACC-OR"}>ACC-OR</MenuItem>
                         <MenuItem value={"ACC-Anesthesia"}>ACC-Anesthesia</MenuItem>
                     </Select>
-                    {/* <FormHelperText>Label + placeholder</FormHelperText> */}
                 </FormControl>
                 <form></form>
-                {/* <form noValidate autoComplete="off" >
-                    <TextField required className={classes.root}
-                        id="standard-full-width"
-                        name="staff_barcode"
-                        value={this.state.staff_barcode}
-                        onChange={event => this.handleChange(event)}
-                        // style={{ width: "40%", marginBottom: "1%" }}
-                        placeholder="Scan Staff Barcode" label="Required"
-                        InputProps={{
-                            endAdornment: <InputAdornment position="end"><IconButton onClick={this._scan}><CenterFocusWeakOutlinedIcon>
-
-                            </CenterFocusWeakOutlinedIcon></IconButton>
-                            </InputAdornment>,
-                        }}
-                        InputLabelProps={{
-                            shrink: true,
-
-                        }}>
-                    </TextField>
-                </form> */}
                 <Button className={classes.root} style={{ marginTop: "1%" }} color="primary" variant="outlined" onClick={this.addNewMask}>Add Mask</Button>
                 <div>
                     {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
