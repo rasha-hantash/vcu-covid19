@@ -1,17 +1,20 @@
 import React from 'react';
 import '../App.css';
 import {
-    Container, 
-    Button, 
-    Checkbox, 
-    TextField, 
-    InputLabel, 
-    InputAdornment, 
-    IconButton, 
-    MenuItem, 
-    Select, 
-    Input, 
+    Container,
+    Button,
+    Checkbox,
+    TextField,
+    InputLabel,
+    InputAdornment,
+    IconButton,
+    MenuItem,
+    Select,
+    Input,
     FormControl,
+    FormControlLabel,
+    FormGroup,
+    FormLabel,
     Typography,
     AppBar,
     Toolbar,
@@ -66,6 +69,16 @@ const styles = (theme) => ({
     },
 });
 
+const VCUCheckbox = withStyles({
+    root: {
+      color: "#FFBA00",
+      '&$checked': {
+        color: "#FFBA00",
+      },
+    },
+    checked: {},
+  })((props) => <Checkbox color="default" {...props} />);
+
 class UpdateMask extends React.Component {
     constructor(props) {
         super(props);
@@ -74,6 +87,9 @@ class UpdateMask extends React.Component {
             department: '',
             scanning: false,
             lastresult: [],
+            inc: true,
+            dec: false,
+            destroy: false,
         };
 
         this.backToMain = this.backToMain.bind(this);
@@ -117,12 +133,9 @@ class UpdateMask extends React.Component {
 
 
     handleChange = (event) => {
-        this.setState({
-            ...this.state,
-            [event.target.name]: event.target.value,
-        });
-        console.log(this.state);
+        this.setState({ ...this.state, [event.target.name]: event.target.checked });
     };
+    
 
     async addNewMask() {
         console.log("This is the state", this.state)
@@ -216,19 +229,27 @@ class UpdateMask extends React.Component {
                         <MenuItem value={"ACC-Anesthesia"}>ACC-Anesthesia</MenuItem>
                     </Select>
                 </FormControl>
-                <form>
-                    <Checkbox value="increment" inputProps={{ 'label': 'Increment' }} />
-                </form>
-                <form>
-                    <Checkbox value="decrement" inputProps={{ 'label': 'Decrement' }} />
-                </form>
-                <form>
-                    <Checkbox value="decrement" inputProps={{ 'label': 'Destroyed' }} />
-                </form>
+                <FormControl component="fieldset" className={classes.root}>
+                    <FormLabel component="legend">Mask Clean Status</FormLabel>
+                    <FormGroup>
+                        <FormControlLabel
+                            control={<VCUCheckbox checked={this.state.inc} name="inc" onChange={this.handleChange} />}
+                            label="Increment Cleaning Cycle"
+                        />
+                        <FormControlLabel
+                            control={<VCUCheckbox checked={this.state.dec} name="dec" onChange={this.handleChange} />}
+                            label="Decrement Cleaning Cycle"
+                        />
+                        <FormControlLabel
+                            control={<VCUCheckbox checked={this.state.destroy} name="destroy" onChange={this.handleChange} />}
+                            label="Destroy Mask"
+                        />
+                    </FormGroup>
+                </FormControl>
                 <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined">Update Mask</Button>
-                    <div>
-                        {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
-                    </div>
+                <div>
+                    {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
+                </div>
             </Container>
         )
     }
