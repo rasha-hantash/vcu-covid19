@@ -106,6 +106,27 @@ class UpdateStaff extends React.Component {
         <form noValidate autoComplete="off" >
           <TextField required className={classes.root}
             id="standard-full-width"
+            name="barcode"
+            value={this.state.barcode}
+            onChange={event => this.handleChange(event)}
+            // style={{ width: "40%", marginBottom: "1%" }}
+            placeholder="Scan Staff Barcode" label="Required"
+            InputProps={{
+              endAdornment: <InputAdornment position="end"><IconButton onClick={this._scan}><CenterFocusWeakOutlinedIcon>
+
+              </CenterFocusWeakOutlinedIcon></IconButton>
+              </InputAdornment>,
+            }}
+            InputLabelProps={{
+              shrink: true,
+
+            }}>
+          </TextField>
+
+        </form>
+        <form noValidate autoComplete="off" >
+          <TextField required className={classes.root}
+            id="standard-full-width"
             name="firstname"
             onChange={event => this.handleChange(event)}
             // style={{ marginBottom: "1%", marginLeft: "2%" }}

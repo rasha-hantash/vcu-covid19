@@ -1,10 +1,8 @@
 import React from 'react';
 import './App.css';
-import AddStaff from './Components/AddStaff';
-import AddMask from './Components/AddMask';
-import UpdateMask from './Components/UpdateMask';
-import UpdateStaff from './Components/UpdateStaff';
-import AssignMask from './Components/AssignMask';
+import { 
+  AddStaff, UpdateStaff, AddMask, UpdateMask, AssignMask 
+} from './Components'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
