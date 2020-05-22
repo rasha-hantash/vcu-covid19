@@ -17,6 +17,7 @@ import {
 } from '@material-ui/core';
 import MaskedInput from 'react-text-mask';
 import PropTypes from "prop-types";
+import axios from 'axios';
 import Scanner from './BarcodeScanner/Scanner'
 import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
 import { withStyles } from "@material-ui/core/styles";
@@ -102,10 +103,89 @@ class UpdateStaff extends React.Component {
       lastresult: [],
     };
     this.backToMain = this.backToMain.bind(this);
+    this.updateStaff = this.updateStaff.bind(this);
   }
 
   async backToMain() {
     this.props.history.push('/');
+  }
+
+  _scan = () => {
+    this.setState({ scanning: !this.state.scanning })
+  }
+
+  _onDetected = result => {
+
+    this.state.lastresult.push(result.codeResult.code);
+    console.log(this.state.lastresult);
+    if (this.state.lastresult.length >= 20) {
+      this._logResults();
+      this.setState({ ...this.state, scanning: false })
+      console.log("This is your state", this.state);
+
+    }
+  }
+  _logResults = () => {
+    console.log("This is your result ", this.state.lastresult)
+    let code = this._orderByOccurance(this.state.lastresult)[0];
+    this.setState({ ...this.state, barcode: code })
+  }
+
+  //return the barcode that occured the most during the scan
+  _orderByOccurance = (arr) => {
+    var counts = {};
+    arr.forEach(function (value) {
+      if (!counts[value]) {
+        counts[value] = 0;
+      }
+      counts[value]++;
+    });
+    return Object.keys(counts).sort(function (curKey, nextKey) {
+      return counts[curKey] < counts[nextKey];
+    });
+  }
+
+  //////////^^^^ logic for scanning
+
+  handleChange = (event) => {
+    this.setState({
+      ...this.state,
+      [event.target.name]: event.target.value,
+    });
+    console.log(this.state);
+  };
+
+  async updateStaff() {
+    console.log("This is the state", this.state)
+    const { firstname,
+      lastname,
+      email,
+      barcode,
+      department,
+      textmask,
+      scanning,
+      lastresult } = this.state;
+
+    const staffInformation = {
+      firstname,
+      lastname,
+      email,
+      barcode,
+      department,
+      textmask,
+      scanning,
+      lastresult
+    };
+    console.log("staffInformation", staffInformation)
+    let response = await axios.post('/updateStaff', staffInformation);
+
+
+    if (response) {
+      console.log('Login status:');
+
+    } else {
+      console.error('Login Failed!');
+    }
   }
 
   render() {
@@ -228,7 +308,7 @@ class UpdateStaff extends React.Component {
           // style={{ width: "40%", marginBottom: "1%" }}
           />
         </form>
-        <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined">Update Staff</Button>
+        <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined" onClick={this.updateStaff.bind(this)}>Update Staff</Button>
         <div>
           {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
         </div>

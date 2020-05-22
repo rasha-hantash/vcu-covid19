@@ -14,45 +14,17 @@ app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
+https://airtable.com/tblNWofzBhfqW44OA/viwCptq3RJc3sbXLw/recrFpcqSXuEVqWwc
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
-let deptArray = [['CCH9-STICU', 'recQ0l2LfPFDebWQs'], ['Main1-ED', 'recIopo1MrlaIEh2a'],
-['CCH11-MRICU', 'recJgdeZnX9Oignom'], ['CCH11-NSICU', 'recBGEPiC2Ym1Zdhn'], ['N9-ICT', 'recsRYI8ragfwpKR2'],
-['Main5-OR', 'recRJH04JrjkSoFF5'], ['ACC-OR', 'rec3TitqxsVHLB6aB'], ['ACC-Anesthesia', 'recvPp6tGJ3WTIe8M']]
+let deptArray = [['CCH9-STICU', 'recPOMw3GCT2Dc8vC'], ['Main1-ED', 'recHcQSjdezz7FtHk'],
+['CCH11-MRICU', 'recI4EIhOKndHhz3w'], ['CCH11-NSICU', 'recAu5jA3PcLq0pWx'], ['N9-ICT', 'recrFpcqSXuEVqWwc'],
+['Main5-OR', 'recQx8umaexJhpRkf'], ['ACC-OR', 'rec2HJXIYf96aCiPL'], ['ACC-Anesthesia', 'recuDQAL7whliJqNW']]
 
 // Use the regular Map constructor to transform a 2D key-value Array into a map
 let departmentMap = new Map(deptArray)
 
 departmentMap.get('key1') // returns "value1"
-
-
-app.post('/getMaskRecords', (req, res) => {
-  console.log("The request", req.body.maskID);
-  let Airtable = require('airtable');
-  let base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_KEY);
-  // filterByFormula: 'Find("${my_name}", Mask)'
-  //1000002
-  var filter = "Find(\"" + `${req.body.maskID}` + "\"" + ", Mask)";
-  //'Find("1000002", Mask)'
-  console.log("Filter", filter);
-  base('Mask Uses').select({
-    view: "Grid view",
-    filterByFormula: filter
-  }).eachPage(function page(records, fetchNextPage) {
-    res.json(records);
-    records.forEach(function (record) {
-
-      if (record.get('Mask') == "1000002") {
-        console.log('Retrieved', record.get('Name') + " " + record.get("Mask Uses"));
-      }
-    });
-    fetchNextPage();
-
-  }, function done(err) {
-    if (err) { console.error(err); return; }
-  });
-});
 
 app.post('/addNewStaff', (req, res) => {
   console.log("The request", req.body);
@@ -88,6 +60,51 @@ app.post('/addNewStaff', (req, res) => {
 
 });
 
+app.post('/updateStaff', (req, res) => {
+  const airtable = new AirtablePlus({
+    baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
+    apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
+    tableName: 'Staff',
+  });
+
+
+
+  (async () => {
+    try {
+
+      console.log(req.body);
+      const staffRes = await airtable.read({
+        filterByFormula: `{Staff Barcode} = "${req.body.barcode}"`
+      });
+
+
+      if (staffRes.length === 0) {
+        console.log("here not found");
+        res.status(200).send({ message: 'User not found', severity: 'warning' });
+      }
+
+      console.log("this is staffres", staffRes)
+      console.log("department", staffRes[0].fields['Building/Floor/Unit'])
+      let buildingFloorUnit = departmentMap.get(req.body.department);
+      console.log(buildingFloorUnit)
+      const updateRes = await airtable.update(staffRes[0].id, {
+        "Name": req.body.lastname + ", " + req.body.firstname,
+        "Email": req.body.email,
+        "Phone Number": req.body.textmask,
+        "Building/Floor/Unit": 
+          [buildingFloorUnit]
+        ,
+        // "Staff Barcode": { "text": req.body.barcode, "type": "" },
+      });
+      console.log("success")
+      res.status(200).send({message: 'Success!', severity: 'success'});
+
+    }
+    catch (e) {
+      console.error(e);
+    }
+  })();
+})
 
 app.post('/addNewMask', (req, res) => {
   console.log("The request", req.body);
@@ -105,7 +122,7 @@ app.post('/addNewMask', (req, res) => {
         "Mask Type": "3D-printed"
       }
     }
-  ], function(err, records) {
+  ], function (err, records) {
     if (err) {
       console.error(err);
       return;
@@ -116,46 +133,6 @@ app.post('/addNewMask', (req, res) => {
   });
 
 });
-
-app.post('/retrieveRecordsFromStaffByBarcode', (req, res) => {
-
-  
-
-  // baseID, apiKey, and tableName can alternatively be set by environment variables
-  const airtable = new AirtablePlus({
-    baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
-    apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
-    tableName: 'Staff',
-  });
-
-  console.log(req.body);
-
-  (async () => {
-    try {
-      const cfg = { tableName: 'Masks' };
-      const maskRes = await airtable.read({
-        filterByFormula: `{User Barcode} = "${req.body.barcode}"`
-      }, cfg);
-      
-      const staffRes = await airtable.read({
-        filterByFormula: `{Staff Barcode} = "${req.body.barcode}"`
-      });
-
-      let result = [];
-      result[0] = staffRes;
-      result[1] = maskRes;
-      console.log("this is result[0]: ", result[0]);
-      console.log("this is result[1] ", result[1]);
-      res.json(result);
-
-    }
-    catch (e) {
-      console.error(e);
-    }
-  })();
-});
-
-
 
 
 // The "catchall" handler: for any request that doesn't
