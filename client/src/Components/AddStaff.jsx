@@ -182,11 +182,7 @@ class AddStaff extends React.Component {
       scanning,
       lastresult
     };
-    const fullname = this.state.firstname + " " + this.state.lastname;
-    this.props.history.push({
-      pathname: '/staff/add/result',
-      state: staffInformation
-    });
+    
     let response = await axios.post('/addNewStaff', staffInformation);
 
 
@@ -197,24 +193,8 @@ class AddStaff extends React.Component {
     } else {
       console.error('Login Failed!');
     }
-    // });//.then(() => {
-    // if(!response.error){
-    //   c
-    //  }
 
-
-    //   this.setState({ records: response.data });
-    //   
-
-    // history.push('/staff/add/result', { fullname: fullname });
-    // });
-    // console.log(response.data);
-
-
-    // maybe create a this.staff.records variable
     console.log("These are records", this.state.records);
-
-
 
   }
 

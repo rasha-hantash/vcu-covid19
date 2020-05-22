@@ -190,6 +190,52 @@ app.post('/updateMask', (req, res) => {
 })
 
 
+app.post('/assignMaskToUser', (req, res) => {
+  const airtable = new AirtablePlus({
+    baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
+    apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
+    tableName: 'Staff',
+  });
+
+
+
+  (async () => {
+    try {
+
+      console.log(req.body);
+      const staffRes = await airtable.read({
+        filterByFormula: `{Staff Barcode} = "${req.body.staff_barcode}"`
+      });
+
+
+      if (staffRes.length === 0) {
+        console.log("here not found");
+        res.status(200).send({ message: 'User not found', severity: 'warning' });
+      }
+      console.log(staffRes)
+
+      const cfg = { tableName: 'Masks' };
+      const maskRes = await airtable.read({
+        filterByFormula: `{Mask Barcode} = "${req.body.mask_barcode}"`
+      }, cfg);
+      if (maskRes.length === 0) {
+        console.log("here not found");
+        res.status(200).send({ message: 'Mask not found', severity: 'warning' });
+      }
+
+      const updateRes = await airtable.update(maskRes[0].id, {
+          'Owner': [staffRes[0].id]
+      }, cfg);
+      console.log("success")
+      res.status(200).send({ message: 'Success!', severity: 'success' });
+
+    }
+    catch (e) {
+      console.error(e);
+    }
+  })();
+})
+
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.get('*', (req, res) => {

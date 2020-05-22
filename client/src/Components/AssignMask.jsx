@@ -1,27 +1,32 @@
 
 import React from 'react';
 import '../App.css';
-import { 
-    Container, 
-    Button, 
-    TextField, 
-    InputLabel, 
-    InputAdornment, 
-    IconButton, 
-    MenuItem, 
-    Select, 
-    Input, 
+import {
+    Container,
+    Button,
+    TextField,
+    InputLabel,
+    InputAdornment,
+    IconButton,
+    MenuItem,
+    Select,
+    Input,
     FormControl,
     Typography,
     AppBar,
     Toolbar,
+    Snackbar,
 } from '@material-ui/core';
-import { withStyles} from "@material-ui/core/styles";
+import { withStyles } from "@material-ui/core/styles";
 import Scanner from './BarcodeScanner/Scanner'
 import axios from 'axios';
 import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import MuiAlert from '@material-ui/lab/Alert';
 
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const styles = (theme) => ({
     marginAutoContainer: {
@@ -71,16 +76,22 @@ class AssignMask extends React.Component {
         super(props);
         this.state = {
             mask_barcode: '',
-            department: '',
+            staff_barcode: '',
+            type: '',
             scanning: false,
             lastresult: [],
+            severity: 'success',
+            message: 'Success!',
+            open: false
         };
 
         this.backToMain = this.backToMain.bind(this);
+        this.assignMask = this.assignMask.bind(this);
     }
 
-    _scan = () => {
+    _scan = (barcode) => {
         this.setState({ scanning: !this.state.scanning })
+        this.setState({ type: barcode })
     }
 
     _onDetected = result => {
@@ -97,7 +108,14 @@ class AssignMask extends React.Component {
     _logResults = () => {
         console.log("This is your result ", this.state.lastresult)
         let code = this._orderByOccurance(this.state.lastresult)[0];
-        this.setState({ ...this.state, mask_barcode: code })
+        console.log("this is the type", this.state.type)
+        if (this.state.type == 'staff') {
+            this.setState({ ...this.state, staff_barcode: code })
+        }
+        if (this.state.type == 'mask') {
+            this.setState({ ...this.state, mask_barcode: code })
+        }
+
     }
 
 
@@ -128,6 +146,53 @@ class AssignMask extends React.Component {
         this.props.history.push('/');
     }
 
+    async assignMask() {
+
+        const { mask_barcode,
+            staff_barcode,
+            type,
+            scanning,
+            lastresult,
+            severity,
+            message,
+            open } = this.state;
+
+        const assignmentInformation = {
+            mask_barcode,
+            staff_barcode,
+            type,
+            scanning,
+            lastresult,
+            severity,
+            message,
+            open
+        };
+
+        let response = await axios.post('/assignMaskToUser', assignmentInformation);
+        this.state.message = response.data.message;
+        this.state.severity = response.data.severity;
+        this.setState({ ...this.state, open: true });
+
+        if (response) {
+            // const type = await response.json();
+            console.log('Login status:');
+
+        } else {
+            console.error('Login Failed!');
+        }
+
+        console.log("These are records", this.state.records);
+
+    }
+
+    handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        console.log('here');
+        this.setState({ ...this.state, open: false });
+    };
+
     render() {
         const { classes } = this.props;
         return (
@@ -147,17 +212,17 @@ class AssignMask extends React.Component {
                 </AppBar>
                 <br />
                 <br />
-                
+
                 <form noValidate autoComplete="off" >
                     <TextField required className={classes.root}
                         id="standard-full-width"
-                        name="mask_barcode"
-                        value={this.state.mask_barcode}
+                        name="staff_barcode"
+                        value={this.state.staff_barcode}
                         onChange={event => this.handleChange(event)}
                         // style={{ width: "40%", marginBottom: "1%" }}
-                        placeholder="Scan Mask Barcode" label="Required"
+                        placeholder="Scan Staff Barcode" label="Required"
                         InputProps={{
-                            endAdornment: <InputAdornment position="end"><IconButton onClick={this._scan}><CenterFocusWeakOutlinedIcon>
+                            endAdornment: <InputAdornment position="end"><IconButton onClick={() => this._scan('staff')}><CenterFocusWeakOutlinedIcon>
 
                             </CenterFocusWeakOutlinedIcon></IconButton>
                             </InputAdornment>,
@@ -178,7 +243,7 @@ class AssignMask extends React.Component {
                         // style={{ width: "40%", marginBottom: "1%" }}
                         placeholder="Scan Mask Barcode" label="Required"
                         InputProps={{
-                            endAdornment: <InputAdornment position="end"><IconButton onClick={this._scan}><CenterFocusWeakOutlinedIcon>
+                            endAdornment: <InputAdornment position="end"><IconButton onClick={() => this._scan('mask')}><CenterFocusWeakOutlinedIcon>
 
                             </CenterFocusWeakOutlinedIcon></IconButton>
                             </InputAdornment>,
@@ -189,7 +254,12 @@ class AssignMask extends React.Component {
                         }}>
                     </TextField>
                 </form>
-                <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined">Assign</Button>
+                <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined" onClick={this.assignMask.bind(this)}>Assign</Button>
+                <Snackbar open={this.state.open} autoHideDuration={3000} onClose={this.handleClose} key={`${this.state.vertical}`}>
+                    <Alert onClose={this.handleClose} severity={this.state.severity}>
+                        {this.state.message}
+                    </Alert>
+                </Snackbar>
                 <div>
                     {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
                 </div>
