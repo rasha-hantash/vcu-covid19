@@ -91,13 +91,13 @@ app.post('/updateStaff', (req, res) => {
         "Name": req.body.lastname + ", " + req.body.firstname,
         "Email": req.body.email,
         "Phone Number": req.body.textmask,
-        "Building/Floor/Unit": 
+        "Building/Floor/Unit":
           [buildingFloorUnit]
         ,
         // "Staff Barcode": { "text": req.body.barcode, "type": "" },
       });
       console.log("success")
-      res.status(200).send({message: 'Success!', severity: 'success'});
+      res.status(200).send({ message: 'Success!', severity: 'success' });
 
     }
     catch (e) {
@@ -133,6 +133,61 @@ app.post('/addNewMask', (req, res) => {
   });
 
 });
+
+app.post('/updateMask', (req, res) => {
+  const airtable = new AirtablePlus({
+    baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
+    apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
+    tableName: 'Masks',
+  });
+
+  console.log(req.body);
+  (async () => {
+    try {
+
+      console.log(req.body);
+      const maskRes = await airtable.read({
+        filterByFormula: `{Mask Barcode} = "${req.body.mask_barcode}"`
+      });
+      console.log("mask res", maskRes);
+
+
+      if (maskRes.length === 0) {
+        console.log("here not found");
+        res.status(200).send({ message: 'User not found', severity: 'warning' });
+      }
+
+
+      if (req.body.destroy === true) {
+        console.log('true')
+        await airtable.delete(maskRes[0].id)
+      } else {
+
+        console.log('false')
+        cycle = 0
+        if (req.body.inc == true) {
+          cycle = 1
+        }
+        if (req.body.dec == true) {
+          cycle = -1
+        }
+        let unit = departmentMap.get(req.body.department);
+        console.log(unit)
+        const updateRes = await airtable.update(maskRes[0].id, {
+          'Unit Code': [unit],
+          'Sterilize Cycles': maskRes[0].fields['Sterilize Cycles'] + cycle
+        })
+        console.log(updateRes)
+      }
+
+
+
+    }
+    catch (e) {
+      console.error(e);
+    }
+  })();
+})
 
 
 // The "catchall" handler: for any request that doesn't

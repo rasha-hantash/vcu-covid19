@@ -91,7 +91,7 @@ class UpdateMask extends React.Component {
             dec: false,
             destroy: false,
         };
-
+        this.updateMask = this.updateMask.bind(this);
         this.backToMain = this.backToMain.bind(this);
     }
 
@@ -133,11 +133,49 @@ class UpdateMask extends React.Component {
 
 
     handleChange = (event) => {
+        this.setState({
+            ...this.state,
+            [event.target.name]: event.target.value,
+          });
+          console.log(this.state);
+    };
+
+    handleChangeCheckbox = (event) => {
         this.setState({ ...this.state, [event.target.name]: event.target.checked });
+        console.log(this.state)
     };
 
     async backToMain() {
         this.props.history.push('/');
+    }
+    async updateMask() {
+        const { mask_barcode,
+            department,
+            scanning,
+            lastresult,
+            inc,
+            dec,
+            destroy
+            } = this.state;
+
+        const maskInformation = {
+            mask_barcode,
+            department,
+            scanning,
+            lastresult,
+            inc,
+            dec,
+            destroy
+        };
+        let response = await axios.post('/updateMask', maskInformation);
+
+
+        if (response) {
+            console.log('Login status:');
+
+        } else {
+            console.error('Login Failed!');
+        }
     }
 
     render() {
@@ -206,24 +244,27 @@ class UpdateMask extends React.Component {
                         <MenuItem value={"ACC-Anesthesia"}>ACC-Anesthesia</MenuItem>
                     </Select>
                 </FormControl>
+                <div>
                 <FormControl component="fieldset" className={classes.root}>
                     <FormLabel component="legend">Mask Clean Status</FormLabel>
                     <FormGroup>
                         <FormControlLabel
-                            control={<VCUCheckbox checked={this.state.inc} name="inc" onChange={this.handleChange} />}
+                            control={<VCUCheckbox checked={this.state.inc} name="inc" onChange={this.handleChangeCheckbox} />}
                             label="Increment Cleaning Cycle"
                         />
                         <FormControlLabel
-                            control={<VCUCheckbox checked={this.state.dec} name="dec" onChange={this.handleChange} />}
+                            control={<VCUCheckbox checked={this.state.dec} name="dec" onChange={this.handleChangeCheckbox} />}
                             label="Decrement Cleaning Cycle"
                         />
                         <FormControlLabel
-                            control={<VCUCheckbox checked={this.state.destroy} name="destroy" onChange={this.handleChange} />}
+                            control={<VCUCheckbox checked={this.state.destroy} name="destroy" onChange={this.handleChangeCheckbox} />}
                             label="Destroy Mask"
                         />
                     </FormGroup>
                 </FormControl>
-                <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined">Update Mask</Button>
+                </div>
+                <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} 
+                    color="primary" variant="outlined" onClick={this.updateMask.bind(this)}>Update Mask</Button>
                 <div>
                     {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
                 </div>
