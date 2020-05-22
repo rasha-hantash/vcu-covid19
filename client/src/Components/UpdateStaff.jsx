@@ -4,16 +4,17 @@ import {
   Container,
   Button,
   TextField,
-  InputLabel, 
-  InputAdornment, 
-  IconButton, 
-  MenuItem, 
-  Select, 
-  Input, 
+  InputLabel,
+  InputAdornment,
+  IconButton,
+  MenuItem,
+  Select,
+  Input,
   FormControl,
   Typography,
   AppBar,
   Toolbar,
+  Snackbar,
 } from '@material-ui/core';
 import MaskedInput from 'react-text-mask';
 import PropTypes from "prop-types";
@@ -23,7 +24,11 @@ import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutli
 import { withStyles } from "@material-ui/core/styles";
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import MuiAlert from '@material-ui/lab/Alert';
 
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 const styles = (theme) => ({
   marginAutoContainer: {
     height: "50%",
@@ -101,6 +106,9 @@ class UpdateStaff extends React.Component {
       textmask: "",
       scanning: false,
       lastresult: [],
+      severity: 'success',
+      message: 'Success!',
+      open: false
     };
     this.backToMain = this.backToMain.bind(this);
     this.updateStaff = this.updateStaff.bind(this);
@@ -125,10 +133,22 @@ class UpdateStaff extends React.Component {
 
     }
   }
-  _logResults = () => {
+
+  async _logResults() {
     console.log("This is your result ", this.state.lastresult)
     let code = this._orderByOccurance(this.state.lastresult)[0];
     this.setState({ ...this.state, barcode: code })
+    let response = await axios.post('/getStaffInformation', this.state);
+    console.log("response staff info", response)
+    let fullname = response.data.staffInfo[0].fields['Name'].split(',')
+    console.log("full name", fullname)
+
+    this.setState({ ...this.state, firstname: fullname[1].trim() })
+    this.setState({ ...this.state, lastname: fullname[0].trim() })
+    // this.setState({...this.state, email: response.data.staffInfo[0].fields['Email'] })
+    this.setState({ ...this.state, textmask: response.data.staffInfo[0].fields['Phone Number'] })
+    console.log(this.state)
+
   }
 
   //return the barcode that occured the most during the scan
@@ -164,7 +184,10 @@ class UpdateStaff extends React.Component {
       department,
       textmask,
       scanning,
-      lastresult } = this.state;
+      lastresult,
+      severity,
+      message,
+      open } = this.state;
 
     const staffInformation = {
       firstname,
@@ -174,11 +197,16 @@ class UpdateStaff extends React.Component {
       department,
       textmask,
       scanning,
-      lastresult
+      lastresult,
+      severity,
+      message,
+      open
     };
     console.log("staffInformation", staffInformation)
     let response = await axios.post('/updateStaff', staffInformation);
-
+    this.state.message = response.data.message;
+        this.state.severity = response.data.severity;
+        this.setState({ ...this.state, open: true });
 
     if (response) {
       console.log('Login status:');
@@ -187,6 +215,13 @@ class UpdateStaff extends React.Component {
       console.error('Login Failed!');
     }
   }
+  handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    console.log('here');
+    this.setState({ ...this.state, open: false });
+  };
 
   render() {
     const { classes } = this.props;
@@ -239,6 +274,7 @@ class UpdateStaff extends React.Component {
           <TextField required className={classes.root}
             id="standard-full-width"
             name="firstname"
+            value={this.state.firstname}
             onChange={event => this.handleChange(event)}
             // style={{ marginBottom: "1%", marginLeft: "2%" }}
             placeholder="Enter First"
@@ -251,6 +287,7 @@ class UpdateStaff extends React.Component {
           <TextField required className={classes.root}
             id="standard-full-width"
             name="lastname"
+            value={this.state.lastname}
             onChange={event => this.handleChange(event)}
             // style={{ marginBottom: "1%", marginLeft: "2%" }}
             placeholder="Enter Last Name"
@@ -263,6 +300,7 @@ class UpdateStaff extends React.Component {
           <TextField required className={classes.root}
             id="standard-full-width"
             name="email"
+            value={this.state.email}
             onChange={event => this.handleChange(event)}
             // style={{ width: "40%", marginBottom: "1%" }}
             placeholder="Enter email"
@@ -309,6 +347,11 @@ class UpdateStaff extends React.Component {
           />
         </form>
         <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined" onClick={this.updateStaff.bind(this)}>Update Staff</Button>
+        <Snackbar open={this.state.open} autoHideDuration={3000} onClose={this.handleClose} key={`${this.state.vertical}`}>
+          <Alert onClose={this.handleClose} severity={this.state.severity}>
+            {this.state.message}
+          </Alert>
+        </Snackbar>
         <div>
           {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
         </div>

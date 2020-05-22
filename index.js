@@ -7,7 +7,11 @@ const app = express();
 // const dotenv = require('dotenv');
 // dotenv.config();
 require('dotenv').config();
-
+// Object.prototype.getKey = function(value) {
+//         var object = this;
+//         console.log('get key')
+//         return Object.keys(object).find(key => object[key] === value);
+//       };
 const AirtablePlus = require('airtable-plus');
 var cors = require('cors');
 app.use(cors());
@@ -39,7 +43,7 @@ app.post('/addNewStaff', (req, res) => {
   base('Staff').create([
     {
       "fields": {
-        "Name": req.body.firstname + " " + req.body.lastname,
+        "Name": req.body.firstname + ", " + req.body.lastname,
         "Email": req.body.email,
         "Phone Number": req.body.textmask,
         "Building/Floor/Unit": [
@@ -60,6 +64,45 @@ app.post('/addNewStaff', (req, res) => {
 
 });
 
+app.post('/getStaffInformation', (req, res) => {
+  const airtable = new AirtablePlus({
+    baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
+    apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
+    tableName: 'Staff',
+  });
+
+
+
+  (async () => {
+    try {
+
+      console.log(req.body);
+      const staffRes = await airtable.read({
+        filterByFormula: `{Staff Barcode} = "${req.body.barcode}"`
+      });
+
+
+      if (staffRes.length === 0) {
+        console.log("here not found");
+        res.status(200).send({ message: 'User not found', severity: 'warning' });
+      }
+      for (let role of departmentMap.values()) {
+        console.log(role);
+    }
+      
+      
+      // console.log("department key", departmentMap.getKey("recPOMw3GCT2Dc8vC"))
+      console.log(staffRes[0].fields['Building/Floor/Unit'][0])
+      // console.log("get key by value", getKeyByValue(departmentMap, "recPOMw3GCT2Dc8vC"))
+      console.log("this is staff res", staffRes)
+      res.status(200).send({ message: 'Success!', severity: 'success', staffInfo: staffRes });
+
+    }
+    catch (e) {
+      console.error(e);
+    }
+  })();
+})
 app.post('/updateStaff', (req, res) => {
   const airtable = new AirtablePlus({
     baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
@@ -94,10 +137,10 @@ app.post('/updateStaff', (req, res) => {
         "Building/Floor/Unit":
           [buildingFloorUnit]
         ,
-        // "Staff Barcode": { "text": req.body.barcode, "type": "" },
       });
       console.log("success")
-      res.status(200).send({ message: 'Success!', severity: 'success' });
+      
+      res.status(200).send({ message: 'Success!', severity: 'success', data: updateRes });
 
     }
     catch (e) {
@@ -133,6 +176,7 @@ app.post('/addNewMask', (req, res) => {
   });
 
 });
+
 
 app.post('/updateMask', (req, res) => {
   const airtable = new AirtablePlus({
