@@ -1,19 +1,20 @@
 import React from 'react';
 import '../App.css';
 import {
-  Container, 
-  Button, 
-  TextField, 
-  InputLabel, 
-  InputAdornment, 
-  IconButton, 
-  MenuItem, 
-  Select, 
-  Input, 
-  FormControl, 
+  Container,
+  Button,
+  TextField,
+  InputLabel,
+  InputAdornment,
+  IconButton,
+  MenuItem,
+  Select,
+  Input,
+  FormControl,
   Typography,
   AppBar,
   Toolbar,
+  Snackbar
 } from '@material-ui/core';
 import { withStyles } from "@material-ui/core/styles";
 import MaskedInput from 'react-text-mask';
@@ -23,7 +24,11 @@ import axios from 'axios';
 import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
 import { withRouter } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import MuiAlert from '@material-ui/lab/Alert';
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 
 const styles = theme => ({
@@ -106,6 +111,9 @@ class AddStaff extends React.Component {
       textmask: '(  )    -    ',
       scanning: false,
       lastresult: [],
+      severity: 'success',
+      message: 'Success!',
+      open: false
 
     };
     this.addNewStaff = this.addNewStaff.bind(this);
@@ -170,7 +178,10 @@ class AddStaff extends React.Component {
       department,
       textmask,
       scanning,
-      lastresult } = this.state;
+      lastresult,
+      severity,
+      message,
+      open } = this.state;
 
     const staffInformation = {
       firstname,
@@ -180,14 +191,19 @@ class AddStaff extends React.Component {
       department,
       textmask,
       scanning,
-      lastresult
+      lastresult,
+      severity,
+      message,
+      open
     };
-    
-    let response = await axios.post('/addNewStaff', staffInformation);
 
+    let response = await axios.post('/addNewStaff', staffInformation);
+    // console.log("MESSAGE!!!!",response.data.message);
+    this.state.message = response.data.message;
+    this.state.severity = response.data.severity;
+    this.setState({ ...this.state, open: true });
 
     if (response) {
-      const type = await response.json();
       console.log('Login status:');
 
     } else {
@@ -197,6 +213,14 @@ class AddStaff extends React.Component {
     console.log("These are records", this.state.records);
 
   }
+
+  handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    console.log('here');
+    this.setState({ ...this.state, open: false });
+  };
 
   async backToMain() {
     this.props.history.push('/');
@@ -322,6 +346,11 @@ class AddStaff extends React.Component {
           />
         </form>
         <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined" onClick={this.addNewStaff.bind(this)}>Add Staff</Button>
+        <Snackbar open={this.state.open} autoHideDuration={3000} onClose={this.handleClose} key={`${this.state.vertical}`}>
+          <Alert onClose={this.handleClose} severity={this.state.severity}>
+            {this.state.message}
+          </Alert>
+        </Snackbar>
         <div>
           {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
         </div>

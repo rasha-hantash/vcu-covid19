@@ -60,6 +60,7 @@ app.post('/addNewStaff', (req, res) => {
     records.forEach(function (record) {
       console.log(record.getId());
     });
+    res.status(200).send({ message: 'Success!', severity: 'success' });
   });
 
 });
@@ -173,6 +174,9 @@ app.post('/addNewMask', (req, res) => {
     records.forEach(function (record) {
       console.log(record.getId());
     });
+    console.log("success")
+      
+      res.status(200).send({ message: 'Success!', severity: 'success'});
   });
 
 });
@@ -198,7 +202,7 @@ app.post('/updateMask', (req, res) => {
 
       if (maskRes.length === 0) {
         console.log("here not found");
-        res.status(200).send({ message: 'User not found', severity: 'warning' });
+        res.status(200).send({ message: 'Mask not found', severity: 'warning' });
       }
 
 
@@ -222,6 +226,7 @@ app.post('/updateMask', (req, res) => {
           'Sterilize Cycles': maskRes[0].fields['Sterilize Cycles'] + cycle
         })
         console.log(updateRes)
+        res.status(200).send({ message: 'Success!', severity: 'success', data: updateRes });
       }
 
 

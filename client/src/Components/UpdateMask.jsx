@@ -18,13 +18,18 @@ import {
     Typography,
     AppBar,
     Toolbar,
+    Snackbar
 } from '@material-ui/core';
 import { withStyles } from "@material-ui/core/styles";
 import Scanner from './BarcodeScanner/Scanner'
 import axios from 'axios';
 import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import MuiAlert from '@material-ui/lab/Alert';
 
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const styles = (theme) => ({
     marginAutoContainer: {
@@ -71,13 +76,13 @@ const styles = (theme) => ({
 
 const VCUCheckbox = withStyles({
     root: {
-      color: "#FFBA00",
-      '&$checked': {
         color: "#FFBA00",
-      },
+        '&$checked': {
+            color: "#FFBA00",
+        },
     },
     checked: {},
-  })((props) => <Checkbox color="default" {...props} />);
+})((props) => <Checkbox color="default" {...props} />);
 
 class UpdateMask extends React.Component {
     constructor(props) {
@@ -90,6 +95,9 @@ class UpdateMask extends React.Component {
             inc: true,
             dec: false,
             destroy: false,
+            severity: 'success',
+            message: 'Success!',
+            open: false
         };
         this.updateMask = this.updateMask.bind(this);
         this.backToMain = this.backToMain.bind(this);
@@ -136,8 +144,8 @@ class UpdateMask extends React.Component {
         this.setState({
             ...this.state,
             [event.target.name]: event.target.value,
-          });
-          console.log(this.state);
+        });
+        console.log(this.state);
     };
 
     handleChangeCheckbox = (event) => {
@@ -155,8 +163,11 @@ class UpdateMask extends React.Component {
             lastresult,
             inc,
             dec,
-            destroy
-            } = this.state;
+            destroy,
+            severity,
+            message,
+            open
+        } = this.state;
 
         const maskInformation = {
             mask_barcode,
@@ -165,10 +176,15 @@ class UpdateMask extends React.Component {
             lastresult,
             inc,
             dec,
-            destroy
+            destroy,
+            severity,
+            message,
+            open
         };
         let response = await axios.post('/updateMask', maskInformation);
-
+        this.state.message = response.data.message;
+        this.state.severity = response.data.severity;
+        this.setState({ ...this.state, open: true });
 
         if (response) {
             console.log('Login status:');
@@ -177,6 +193,13 @@ class UpdateMask extends React.Component {
             console.error('Login Failed!');
         }
     }
+    handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        console.log('here');
+        this.setState({ ...this.state, open: false });
+    };
 
     render() {
         const { classes } = this.props;
@@ -245,26 +268,32 @@ class UpdateMask extends React.Component {
                     </Select>
                 </FormControl>
                 <div>
-                <FormControl component="fieldset" className={classes.root}>
-                    <FormLabel component="legend">Mask Clean Status</FormLabel>
-                    <FormGroup>
-                        <FormControlLabel
-                            control={<VCUCheckbox checked={this.state.inc} name="inc" onChange={this.handleChangeCheckbox} />}
-                            label="Increment Cleaning Cycle"
-                        />
-                        <FormControlLabel
-                            control={<VCUCheckbox checked={this.state.dec} name="dec" onChange={this.handleChangeCheckbox} />}
-                            label="Decrement Cleaning Cycle"
-                        />
-                        <FormControlLabel
-                            control={<VCUCheckbox checked={this.state.destroy} name="destroy" onChange={this.handleChangeCheckbox} />}
-                            label="Destroy Mask"
-                        />
-                    </FormGroup>
-                </FormControl>
+                    <FormControl component="fieldset" className={classes.root}>
+                        <FormLabel component="legend">Mask Clean Status</FormLabel>
+                        <FormGroup>
+                            <FormControlLabel
+                                control={<VCUCheckbox checked={this.state.inc} name="inc" onChange={this.handleChangeCheckbox} />}
+                                label="Increment Cleaning Cycle"
+                            />
+                            <FormControlLabel
+                                control={<VCUCheckbox checked={this.state.dec} name="dec" onChange={this.handleChangeCheckbox} />}
+                                label="Decrement Cleaning Cycle"
+                            />
+                            <FormControlLabel
+                                control={<VCUCheckbox checked={this.state.destroy} name="destroy" onChange={this.handleChangeCheckbox} />}
+                                label="Destroy Mask"
+                            />
+                        </FormGroup>
+                    </FormControl>
                 </div>
-                <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} 
-                    color="primary" variant="outlined" onClick={this.updateMask.bind(this)}>Update Mask</Button>
+                <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }}
+                    color="primary" variant="outlined" onClick={this.updateMask.bind(this)}>Update Mask
+                </Button>
+                <Snackbar open={this.state.open} autoHideDuration={3000} onClose={this.handleClose} key={`${this.state.vertical}`}>
+                    <Alert onClose={this.handleClose} severity={this.state.severity}>
+                        {this.state.message}
+                    </Alert>
+                </Snackbar>
                 <div>
                     {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
                 </div>

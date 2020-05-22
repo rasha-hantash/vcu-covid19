@@ -1,26 +1,31 @@
 import React from 'react';
 import '../App.css';
 import {
-    Container, 
-    Button, 
-    TextField, 
-    InputLabel, 
-    InputAdornment, 
-    IconButton, 
-    MenuItem, 
-    Select, 
-    Input, 
-    FormControl, 
+    Container,
+    Button,
+    TextField,
+    InputLabel,
+    InputAdornment,
+    IconButton,
+    MenuItem,
+    Select,
+    Input,
+    FormControl,
     Typography,
     AppBar,
     Toolbar,
+    Snackbar
 } from '@material-ui/core';
 import { withStyles } from "@material-ui/core/styles";
 import Scanner from './BarcodeScanner/Scanner'
 import axios from 'axios';
 import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutlined';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import MuiAlert from '@material-ui/lab/Alert';
 
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const styles = (theme) => ({
     marginAutoContainer: {
@@ -42,7 +47,7 @@ const styles = (theme) => ({
     },
     root: {
 
-        marginTop: '1em', 
+        marginTop: '1em',
         marginBottom: '1em',
 
         width: "40%",
@@ -73,6 +78,9 @@ class AddMask extends React.Component {
             department: '',
             scanning: false,
             lastresult: [],
+            severity: 'success',
+            message: 'Success!',
+            open: false
         };
 
         this.addNewMask = this.addNewMask.bind(this);
@@ -127,17 +135,23 @@ class AddMask extends React.Component {
     async addNewMask() {
         console.log("This is the state", this.state)
         const { mask_barcode,
-            department } = this.state;
+            department, severity,
+            message,
+            open } = this.state;
 
         const maskInformation = {
             mask_barcode,
-            department
+            department,
+            severity,
+            message,
+            open
         };
         let response = await axios.post('/addNewMask', maskInformation);
-
+        this.state.message = response.data.message;
+        this.state.severity = response.data.severity;
+        this.setState({ ...this.state, open: true });
 
         if (response) {
-            const type = await response.json();
             console.log('Login status:');
 
         } else {
@@ -145,6 +159,13 @@ class AddMask extends React.Component {
         }
 
     }
+    handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        console.log('here');
+        this.setState({ ...this.state, open: false });
+    };
 
     async backToMain() {
         this.props.history.push('/');
@@ -164,7 +185,7 @@ class AddMask extends React.Component {
                 </AppBar>
                 <br />
                 <br />
-                
+
                 <form noValidate autoComplete="off" >
                     <TextField required className={classes.root}
                         id="standard-full-width"
@@ -210,6 +231,11 @@ class AddMask extends React.Component {
                 </FormControl>
                 <form></form>
                 <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined" onClick={this.addNewMask}>Add Mask</Button>
+                <Snackbar open={this.state.open} autoHideDuration={3000} onClose={this.handleClose} key={`${this.state.vertical}`}>
+                    <Alert onClose={this.handleClose} severity={this.state.severity}>
+                        {this.state.message}
+                    </Alert>
+                </Snackbar>
                 <div>
                     {(this.state.scanning) ? <Scanner onDetected={this._onDetected} /> : null}
                 </div>
