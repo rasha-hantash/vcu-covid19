@@ -76,7 +76,6 @@ class AssignMask extends React.Component {
             lastresult: [],
         };
 
-        this.addNewMask = this.addNewMask.bind(this);
         this.backToMain = this.backToMain.bind(this);
     }
 
@@ -124,28 +123,6 @@ class AssignMask extends React.Component {
         });
         console.log(this.state);
     };
-
-    async addNewMask() {
-        console.log("This is the state", this.state)
-        const { mask_barcode,
-            department } = this.state;
-
-        const maskInformation = {
-            mask_barcode,
-            department
-        };
-        let response = await axios.post('/addNewMask', maskInformation);
-
-
-        if (response) {
-            const type = await response.json();
-            console.log('Login status:');
-
-        } else {
-            console.error('Login Failed!');
-        }
-
-    }
 
     async backToMain() {
         this.props.history.push('/');

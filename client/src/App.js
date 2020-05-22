@@ -7,7 +7,15 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import {
-  Container, Card, CardContent, AppBar, Toolbar, Typography, CssBaseline, useScrollTrigger, Box
+  Container, 
+  Card, 
+  CardContent, 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  CssBaseline, 
+  useScrollTrigger, 
+  Box,
 } from '@material-ui/core';
 
 const styles = {
@@ -36,8 +44,6 @@ const styles = {
   appBar: {
     background: '#FFBA00',
     color: 'black'
-
-
   }
 };
 const useStyles = makeStyles(styles);
