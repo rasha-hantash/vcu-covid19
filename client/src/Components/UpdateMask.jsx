@@ -10,7 +10,6 @@ import {
     IconButton,
     MenuItem,
     Select,
-    Input,
     FormControl,
     FormControlLabel,
     FormGroup,
@@ -95,6 +94,10 @@ class UpdateMask extends React.Component {
             inc: true,
             dec: false,
             destroy: false,
+            destroyReason: '',
+            soiled: false,
+            damaged: false,
+            maxUse: false,
             severity: 'success',
             message: 'Success!',
             open: false
@@ -104,6 +107,7 @@ class UpdateMask extends React.Component {
     }
 
     _scan = () => {
+        this.state.lastresult = [];
         this.setState({ scanning: !this.state.scanning })
     }
 
@@ -164,6 +168,10 @@ class UpdateMask extends React.Component {
             inc,
             dec,
             destroy,
+            destroyReason,
+            soiled,
+            damaged,
+            maxUse,
             severity,
             message,
             open
@@ -177,27 +185,54 @@ class UpdateMask extends React.Component {
             inc,
             dec,
             destroy,
+            destroyReason,
+            soiled,
+            damaged,
+            maxUse,
             severity,
             message,
             open
         };
-        let response = await axios.post('/updateMask', maskInformation);
-        this.state.message = response.data.message;
-        this.state.severity = response.data.severity;
-        this.setState({ ...this.state, open: true });
+        let missingReason = false;
+        console.log("Mask information", maskInformation)
+        if (maskInformation.destroy) {
+            if (maskInformation.soiled == false
+                && maskInformation.damaged == false
+                && maskInformation.maxUse == false) {
+                this.state.severity = "error"
+                this.state.message = "Please select a reason for destroying a mask"
+                this.setState({ ...this.state, open: true });
+                missingReason = true;
+            }
+        } if (!maskInformation.destroy) {
+            if (maskInformation.soiled || maskInformation.damaged || maskInformation.maxUse) {
+                this.state.severity = "error"
+                this.state.message = "Please select Destroy Mask if you intend to destroy the mask"
+                this.setState({ ...this.state, open: true });
+                missingReason = true;
+            }
+        } if(missingReason == false) {
+            if(maskInformation.soiled){
+                maskInformation.destroyReason = "Soiled"
+            }
+            if(maskInformation.damaged){
+                maskInformation.destroyReason = "Damaged"
+            }
+            if(maskInformation.soiled){
+                maskInformation.destroyReason = "Max Use"
+            }
 
-        if (response) {
-            console.log('Login status:');
-
-        } else {
-            console.error('Login Failed!');
+            let response = await axios.post('/updateMask', maskInformation);
+            this.state.message = response.data.message;
+            this.state.severity = response.data.severity;
+            this.setState({ ...this.state, open: true });
         }
+
     }
     handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        console.log('here');
         this.setState({ ...this.state, open: false });
     };
 
@@ -282,6 +317,19 @@ class UpdateMask extends React.Component {
                             <FormControlLabel
                                 control={<VCUCheckbox checked={this.state.destroy} name="destroy" onChange={this.handleChangeCheckbox} />}
                                 label="Destroy Mask"
+                            />
+                            <span style={{ color: 'grey', textAlign: 'left' }}>If destroyed, please select the reason*</span>
+                            <FormControlLabel style={{ marginLeft: "3%" }}
+                                control={<VCUCheckbox checked={this.state.soiled} name="soiled" onChange={this.handleChangeCheckbox} />}
+                                label="Soiled"
+                            />
+                            <FormControlLabel style={{ marginLeft: "3%" }}
+                                control={<VCUCheckbox checked={this.state.damaged} name="damaged" onChange={this.handleChangeCheckbox} />}
+                                label="Damaged"
+                            />
+                            <FormControlLabel style={{ marginLeft: "3%" }}
+                                control={<VCUCheckbox checked={this.state.maxUse} name="maxUse" onChange={this.handleChangeCheckbox} />}
+                                label="Max Use"
                             />
                         </FormGroup>
                     </FormControl>

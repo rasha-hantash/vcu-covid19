@@ -129,6 +129,7 @@ app.post('/updateStaff', (req, res) => {
 
       console.log("this is staffres", staffRes)
       console.log("department", staffRes[0].fields['Building/Floor/Unit'])
+      // TODO: be able to grab value from departmentMap to update form
       let buildingFloorUnit = departmentMap.get(req.body.department);
       console.log(buildingFloorUnit)
       const updateRes = await airtable.update(staffRes[0].id, {
@@ -208,7 +209,11 @@ app.post('/updateMask', (req, res) => {
 
       if (req.body.destroy === true) {
         console.log('true')
-        await airtable.delete(maskRes[0].id)
+        await airtable.update(maskRes[0].id, {
+          'Status': 'Destroyed',
+          'Why Destroyed': req.body.destroyReason
+        })
+        res.status(200).send({ message: 'Success!', severity: 'success'});
       } else {
 
         console.log('false')

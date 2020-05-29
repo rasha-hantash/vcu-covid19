@@ -124,6 +124,7 @@ class AddStaff extends React.Component {
 
 
   _scan = () => {
+    this.state.lastresult= [];
     this.setState({ scanning: !this.state.scanning })
   }
 

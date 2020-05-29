@@ -13,9 +13,6 @@ import {
   AppBar, 
   Toolbar, 
   Typography, 
-  CssBaseline, 
-  useScrollTrigger, 
-  Box,
 } from '@material-ui/core';
 
 const styles = {

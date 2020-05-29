@@ -9,7 +9,6 @@ import {
     IconButton,
     MenuItem,
     Select,
-    Input,
     FormControl,
     Typography,
     AppBar,
@@ -88,6 +87,7 @@ class AddMask extends React.Component {
     }
 
     _scan = () => {
+        this.state.lastresult= [];
         this.setState({ scanning: !this.state.scanning })
     }
 
@@ -106,6 +106,7 @@ class AddMask extends React.Component {
         console.log("This is your result ", this.state.lastresult)
         let code = this._orderByOccurance(this.state.lastresult)[0];
         this.setState({ ...this.state, mask_barcode: code })
+        
     }
 
 

@@ -119,6 +119,7 @@ class UpdateStaff extends React.Component {
   }
 
   _scan = () => {
+    this.state.lastresult= [];
     this.setState({ scanning: !this.state.scanning })
   }
 

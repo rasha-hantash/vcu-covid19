@@ -5,13 +5,8 @@ import {
     Container,
     Button,
     TextField,
-    InputLabel,
     InputAdornment,
     IconButton,
-    MenuItem,
-    Select,
-    Input,
-    FormControl,
     Typography,
     AppBar,
     Toolbar,
@@ -90,6 +85,7 @@ class AssignMask extends React.Component {
     }
 
     _scan = (barcode) => {
+        this.state.lastresult= [];
         this.setState({ scanning: !this.state.scanning })
         this.setState({ type: barcode })
     }
