@@ -74,6 +74,7 @@ class AddMask extends React.Component {
         super(props);
         this.state = {
             mask_barcode: '',
+            mask_type: 'Cloth N-95',
             department: '',
             scanning: false,
             lastresult: [],
@@ -136,12 +137,15 @@ class AddMask extends React.Component {
     async addNewMask() {
         console.log("This is the state", this.state)
         const { mask_barcode,
-            department, severity,
+            mask_type,
+            department, 
+            severity,
             message,
             open } = this.state;
 
         const maskInformation = {
             mask_barcode,
+            mask_type,
             department,
             severity,
             message,

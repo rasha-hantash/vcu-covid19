@@ -218,7 +218,7 @@ class UpdateMask extends React.Component {
             if(maskInformation.damaged){
                 maskInformation.destroyReason = "Damaged"
             }
-            if(maskInformation.soiled){
+            if(maskInformation.maxUse){
                 maskInformation.destroyReason = "Max Use"
             }
 

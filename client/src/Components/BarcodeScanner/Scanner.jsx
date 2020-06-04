@@ -19,7 +19,7 @@ class Scanner extends Component {
         },
         numOfWorkers: 4,
         decoder: {
-          readers: ['ean_reader'],
+          readers: ['code_128_reader','ean_reader'],
         },
         locate: true,
       },

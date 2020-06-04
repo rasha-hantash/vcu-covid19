@@ -43,7 +43,7 @@ app.post('/addNewStaff', (req, res) => {
   base('Staff').create([
     {
       "fields": {
-        "Name": req.body.firstname + ", " + req.body.lastname,
+        "Name": req.body.lastname + ", " + req.body.firstname,
         "Email": req.body.email,
         "Phone Number": req.body.textmask,
         "Building/Floor/Unit": [
@@ -89,9 +89,9 @@ app.post('/getStaffInformation', (req, res) => {
       }
       for (let role of departmentMap.values()) {
         console.log(role);
-    }
-      
-      
+      }
+
+
       // console.log("department key", departmentMap.getKey("recPOMw3GCT2Dc8vC"))
       console.log(staffRes[0].fields['Building/Floor/Unit'][0])
       // console.log("get key by value", getKeyByValue(departmentMap, "recPOMw3GCT2Dc8vC"))
@@ -141,7 +141,7 @@ app.post('/updateStaff', (req, res) => {
         ,
       });
       console.log("success")
-      
+
       res.status(200).send({ message: 'Success!', severity: 'success', data: updateRes });
 
     }
@@ -162,9 +162,9 @@ app.post('/addNewMask', (req, res) => {
     {
       "fields": {
         "Mask Barcode": { "text": req.body.mask_barcode, "type": "" },
+        "Mask Type": req.body.mask_type,
         "Unit Code": [unitCode],
         "Sterilize Cycles": 0,
-        "Mask Type": "3D-printed"
       }
     }
   ], function (err, records) {
@@ -176,8 +176,8 @@ app.post('/addNewMask', (req, res) => {
       console.log(record.getId());
     });
     console.log("success")
-      
-      res.status(200).send({ message: 'Success!', severity: 'success'});
+
+    res.status(200).send({ message: 'Success!', severity: 'success' });
   });
 
 });
@@ -190,7 +190,6 @@ app.post('/updateMask', (req, res) => {
     tableName: 'Masks',
   });
 
-  console.log(req.body);
   (async () => {
     try {
 
@@ -198,25 +197,29 @@ app.post('/updateMask', (req, res) => {
       const maskRes = await airtable.read({
         filterByFormula: `{Mask Barcode} = "${req.body.mask_barcode}"`
       });
-      console.log("mask res", maskRes);
+
 
 
       if (maskRes.length === 0) {
-        console.log("here not found");
         res.status(200).send({ message: 'Mask not found', severity: 'warning' });
+      }
+      console.log(maskRes[0].fields['Sterilization Alert'])
+      console.log(maskRes)
+      console.log(maskRes[0].fields['Status'])
+      if (maskRes[0].fields['Sterilization Alert'] != null) {
+          console.log("STERILIZATION NOT EMPTY")
+          res.status(200).send({ message: 'Mask has reached MAX cycle use. Please destroy mask', severity: 'error' });
       }
 
 
       if (req.body.destroy === true) {
-        console.log('true')
         await airtable.update(maskRes[0].id, {
           'Status': 'Destroyed',
           'Why Destroyed': req.body.destroyReason
         })
-        res.status(200).send({ message: 'Success!', severity: 'success'});
+        res.status(200).send({ message: 'Success!', severity: 'success' });
       } else {
 
-        console.log('false')
         cycle = 0
         if (req.body.inc == true) {
           cycle = 1
@@ -230,7 +233,6 @@ app.post('/updateMask', (req, res) => {
           'Unit Code': [unit],
           'Sterilize Cycles': maskRes[0].fields['Sterilize Cycles'] + cycle
         })
-        console.log(updateRes)
         res.status(200).send({ message: 'Success!', severity: 'success', data: updateRes });
       }
 
@@ -278,7 +280,7 @@ app.post('/assignMaskToUser', (req, res) => {
       }
 
       const updateRes = await airtable.update(maskRes[0].id, {
-          'Owner': [staffRes[0].id]
+        'Owner': [staffRes[0].id]
       }, cfg);
       console.log("success")
       res.status(200).send({ message: 'Success!', severity: 'success' });
