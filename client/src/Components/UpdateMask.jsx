@@ -122,10 +122,25 @@ class UpdateMask extends React.Component {
 
         }
     }
-    _logResults = () => {
+    async _logResults () {
         console.log("This is your result ", this.state.lastresult)
         let code = this._orderByOccurance(this.state.lastresult)[0];
         this.setState({ ...this.state, mask_barcode: code })
+        let response = await axios.post('/getMaskInformation', this.state);
+        console.log("response staff info", response.data.maskInfo[0].fields)
+        if (response.data.maskInfo[0].fields['Sterilization Alert'] != null) {
+            console.log("STERILIZATION NOT EMPTY")
+            // res.status(200).send({ message: 'Mask has reached MAX cycle use. Please destroy mask', severity: 'error' });
+            this.setState({...this.state, inc: false, maxUse: true, destroy: true })
+        }
+  
+        
+
+        // this.setState({ ...this.state, firstname: fullname[1].trim() })
+        // this.setState({ ...this.state, lastname: fullname[0].trim() })
+        // // this.setState({...this.state, email: response.data.staffInfo[0].fields['Email'] })
+        // this.setState({ ...this.state, textmask: response.data.staffInfo[0].fields['Phone Number'] })
+        // console.log(this.state)
     }
 
 
@@ -211,14 +226,14 @@ class UpdateMask extends React.Component {
                 this.setState({ ...this.state, open: true });
                 missingReason = true;
             }
-        } if(missingReason == false) {
-            if(maskInformation.soiled){
+        } if (missingReason == false) {
+            if (maskInformation.soiled) {
                 maskInformation.destroyReason = "Soiled"
             }
-            if(maskInformation.damaged){
+            if (maskInformation.damaged) {
                 maskInformation.destroyReason = "Damaged"
             }
-            if(maskInformation.maxUse){
+            if (maskInformation.maxUse) {
                 maskInformation.destroyReason = "Max Use"
             }
 
@@ -226,6 +241,9 @@ class UpdateMask extends React.Component {
             this.state.message = response.data.message;
             this.state.severity = response.data.severity;
             this.setState({ ...this.state, open: true });
+            if(this.state.severity == 'error'){
+                this.setState({...this.state, inc: false, maxUse: true, destroy: true })
+            }
         }
 
     }

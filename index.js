@@ -151,6 +151,39 @@ app.post('/updateStaff', (req, res) => {
   })();
 })
 
+app.post('/getMaskInformation', (req, res) =>{
+  const airtable = new AirtablePlus({
+    baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
+    apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
+    tableName: 'Masks',
+  });
+
+
+
+  (async () => {
+    try {
+
+      console.log(req.body);
+      const maskRes = await airtable.read({
+        filterByFormula: `{Mask Barcode} = "${req.body.mask_barcode}"`
+      });
+
+
+      if (maskRes.length === 0) {
+        console.log("here not found");
+        res.status(200).send({ message: 'Mask not found', severity: 'warning' });
+      }
+      for (let role of departmentMap.values()) {
+        console.log(role);
+      }
+      res.status(200).send({ message: 'Success!', severity: 'success', maskInfo: maskRes });
+
+    }
+    catch (e) {
+      console.error(e);
+    }
+  })();
+})
 app.post('/addNewMask', (req, res) => {
   console.log("The request", req.body);
   var Airtable = require('airtable');
