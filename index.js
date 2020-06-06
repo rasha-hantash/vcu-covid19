@@ -18,7 +18,6 @@ app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-https://airtable.com/tblNWofzBhfqW44OA/viwCptq3RJc3sbXLw/recrFpcqSXuEVqWwc
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
 let deptArray = [['CCH9-STICU', 'recPOMw3GCT2Dc8vC'], ['Main1-ED', 'recHcQSjdezz7FtHk'],
@@ -327,11 +326,11 @@ app.post('/assignMaskToUser', (req, res) => {
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/client/build/index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname + '/client/build/index.html'));
+// });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5005;
 app.listen(port);
 
 console.log(`Password generator listening on ${port}`);
