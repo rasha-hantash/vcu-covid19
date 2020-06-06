@@ -19,10 +19,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // Serve static files from the React app
+let devDepartmentID = ['recPOMw3GCT2Dc8vC','recHcQSjdezz7FtHk','recI4EIhOKndHhz3w','recAu5jA3PcLq0pWx','recrFpcqSXuEVqWwc',
+'recQx8umaexJhpRkf', 'rec2HJXIYf96aCiPL','recuDQAL7whliJqNW']
+let prodDepartmentID = ['reckvYOO0PzaJHBEO','reccT2a4xrfHdaWQw','recdLQ028X3lNM2cI', 'rec5bhBln2STwvS5J', 'recWmBubcaaM1VpFo',
+'reclekM7urdRnUktr', 'recxoVftisPeg7LYX', 'recZk2SwrJXtoeTW8']
 app.use(express.static(path.join(__dirname, 'client/build')));
-let deptArray = [['CCH9-STICU', 'recPOMw3GCT2Dc8vC'], ['Main1-ED', 'recHcQSjdezz7FtHk'],
-['CCH11-MRICU', 'recI4EIhOKndHhz3w'], ['CCH11-NSICU', 'recAu5jA3PcLq0pWx'], ['N9-ICT', 'recrFpcqSXuEVqWwc'],
-['Main5-OR', 'recQx8umaexJhpRkf'], ['ACC-OR', 'rec2HJXIYf96aCiPL'], ['ACC-Anesthesia', 'recuDQAL7whliJqNW']]
+let deptArray = [['CCH9-STICU', prodDepartmentID[0]], ['Main1-ED', prodDepartmentID[1]],
+['CCH11-MRICU', prodDepartmentID[2]], ['CCH11-NSICU', prodDepartmentID[3]], ['N9-ICT', prodDepartmentID[4]],
+['Main5-OR', prodDepartmentID[5]], ['ACC-OR', prodDepartmentID[6]], ['ACC-Anesthesia', prodDepartmentID[7]]]
 
 // Use the regular Map constructor to transform a 2D key-value Array into a map
 let departmentMap = new Map(deptArray)
@@ -32,7 +36,6 @@ departmentMap.get('key1') // returns "value1"
 app.post('/addNewStaff', (req, res) => {
   console.log("The request", req.body);
   var Airtable = require('airtable');
-  console.log(process.env);
 
 
   var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY }).base(process.env.REACT_APP_API_AIRTABLE_BASE);
@@ -48,7 +51,7 @@ app.post('/addNewStaff', (req, res) => {
         "Building/Floor/Unit": [
           buildingFloorUnit
         ],
-        "Staff Barcode": { "text": req.body.barcode, "type": "" },
+        "Staff Barcode": { "text": req.body.barcode},
       }
     }
   ], function (err, records) {
