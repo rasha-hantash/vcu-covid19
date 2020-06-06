@@ -42,28 +42,51 @@ app.post('/addNewStaff', (req, res) => {
   console.log(base);
   console.log(base);
   let buildingFloorUnit = departmentMap.get(req.body.department);
-  base('Staff').create([
-    {
-      "fields": {
-        "Name": req.body.lastname + ", " + req.body.firstname,
-        "Email": req.body.email,
-        "Phone Number": req.body.textmask,
-        "Building/Floor/Unit": [
-          buildingFloorUnit
-        ],
-        "Staff Barcode": { "text": req.body.barcode},
+  if(buildingFloorUnit != null){
+    base('Staff').create([
+      {
+        "fields": {
+          "Name": req.body.lastname + ", " + req.body.firstname,
+          "Email": req.body.email,
+          "Phone Number": req.body.textmask,
+          "Building/Floor/Unit": [
+            buildingFloorUnit
+          ],
+          "Staff Barcode": { "text": req.body.barcode},
+        }
       }
-    }
-  ], function (err, records) {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    records.forEach(function (record) {
-      console.log(record.getId());
+    ], function (err, records) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      records.forEach(function (record) {
+        console.log(record.getId());
+      });
+      res.status(200).send({ message: 'Success!', severity: 'success' });
     });
-    res.status(200).send({ message: 'Success!', severity: 'success' });
-  });
+  } else {
+    base('Staff').create([
+      {
+        "fields": {
+          "Name": req.body.lastname + ", " + req.body.firstname,
+          "Email": req.body.email,
+          "Phone Number": req.body.textmask,
+          "Staff Barcode": { "text": req.body.barcode},
+        }
+      }
+    ], function (err, records) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      records.forEach(function (record) {
+        console.log(record.getId());
+      });
+      res.status(200).send({ message: 'Success!', severity: 'success' });
+    });
+  }
+  
 
 });
 
@@ -134,14 +157,24 @@ app.post('/updateStaff', (req, res) => {
       // TODO: be able to grab value from departmentMap to update form
       let buildingFloorUnit = departmentMap.get(req.body.department);
       console.log(buildingFloorUnit)
-      const updateRes = await airtable.update(staffRes[0].id, {
-        "Name": req.body.lastname + ", " + req.body.firstname,
-        "Email": req.body.email,
-        "Phone Number": req.body.textmask,
-        "Building/Floor/Unit":
-          [buildingFloorUnit]
-        ,
-      });
+      let updateRes = '';
+      if(buildingFloorUnit != null){
+        updateRes = await airtable.update(staffRes[0].id, {
+          "Name": req.body.lastname + ", " + req.body.firstname,
+          "Email": req.body.email,
+          "Phone Number": req.body.textmask,
+          "Building/Floor/Unit":
+            [buildingFloorUnit]
+          ,
+        });
+      } else {
+        updateRes = await airtable.update(staffRes[0].id, {
+          "Name": req.body.lastname + ", " + req.body.firstname,
+          "Email": req.body.email,
+          "Phone Number": req.body.textmask,
+        });
+      }
+      
       console.log("success")
 
       res.status(200).send({ message: 'Success!', severity: 'success', data: updateRes });
@@ -193,27 +226,51 @@ app.post('/addNewMask', (req, res) => {
   var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY }).base(process.env.REACT_APP_API_AIRTABLE_BASE);
 
   let unitCode = departmentMap.get(req.body.department);
-  base('Masks').create([
-    {
-      "fields": {
-        "Mask Barcode": { "text": req.body.mask_barcode, "type": "" },
-        "Mask Type": req.body.mask_type,
-        "Unit Code": [unitCode],
-        "Sterilize Cycles": 0,
+  if(unitCode != null){
+    base('Masks').create([
+      {
+        "fields": {
+          "Mask Barcode": { "text": req.body.mask_barcode, "type": "" },
+          "Mask Type": req.body.mask_type,
+          "Unit Code": [unitCode],
+          "Sterilize Cycles": 0,
+        }
       }
-    }
-  ], function (err, records) {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    records.forEach(function (record) {
-      console.log(record.getId());
+    ], function (err, records) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      records.forEach(function (record) {
+        console.log(record.getId());
+      });
+      console.log("success")
+  
+      res.status(200).send({ message: 'Success!', severity: 'success' });
     });
-    console.log("success")
-
-    res.status(200).send({ message: 'Success!', severity: 'success' });
-  });
+  } else {
+    base('Masks').create([
+      {
+        "fields": {
+          "Mask Barcode": { "text": req.body.mask_barcode, "type": "" },
+          "Mask Type": req.body.mask_type,
+          "Sterilize Cycles": 0,
+        }
+      }
+    ], function (err, records) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      records.forEach(function (record) {
+        console.log(record.getId());
+      });
+      console.log("success")
+  
+      res.status(200).send({ message: 'Success!', severity: 'success' });
+    });
+  }
+  
 
 });
 
@@ -264,11 +321,18 @@ app.post('/updateMask', (req, res) => {
         }
         let unit = departmentMap.get(req.body.department);
         console.log(unit)
-        const updateRes = await airtable.update(maskRes[0].id, {
-          'Unit Code': [unit],
-          'Sterilize Cycles': maskRes[0].fields['Sterilize Cycles'] + cycle
-        })
-        res.status(200).send({ message: 'Success!', severity: 'success', data: updateRes });
+        if(unit != null){
+          const updateRes = await airtable.update(maskRes[0].id, {
+            'Unit Code': [unit],
+            'Sterilize Cycles': maskRes[0].fields['Sterilize Cycles'] + cycle
+          })
+          res.status(200).send({ message: 'Success!', severity: 'success', data: updateRes });
+        } else {
+          const updateRes = await airtable.update(maskRes[0].id, {
+            'Sterilize Cycles': maskRes[0].fields['Sterilize Cycles'] + cycle
+          })
+          res.status(200).send({ message: 'Success!', severity: 'success', data: updateRes });
+        }
       }
 
 
