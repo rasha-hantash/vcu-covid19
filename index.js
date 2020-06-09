@@ -19,10 +19,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // Serve static files from the React app
-let devDepartmentID = ['recPOMw3GCT2Dc8vC','recHcQSjdezz7FtHk','recI4EIhOKndHhz3w','recAu5jA3PcLq0pWx','recrFpcqSXuEVqWwc',
-'recQx8umaexJhpRkf', 'rec2HJXIYf96aCiPL','recuDQAL7whliJqNW']
-let prodDepartmentID = ['reckvYOO0PzaJHBEO','reccT2a4xrfHdaWQw','recdLQ028X3lNM2cI', 'rec5bhBln2STwvS5J', 'recWmBubcaaM1VpFo',
-'reclekM7urdRnUktr', 'recxoVftisPeg7LYX', 'recZk2SwrJXtoeTW8']
+let devDepartmentID = ['recPOMw3GCT2Dc8vC', 'recHcQSjdezz7FtHk', 'recI4EIhOKndHhz3w', 'recAu5jA3PcLq0pWx', 'recrFpcqSXuEVqWwc',
+  'recQx8umaexJhpRkf', 'rec2HJXIYf96aCiPL', 'recuDQAL7whliJqNW']
+let prodDepartmentID = ['reckvYOO0PzaJHBEO', 'reccT2a4xrfHdaWQw', 'recdLQ028X3lNM2cI', 'rec5bhBln2STwvS5J', 'recWmBubcaaM1VpFo',
+  'reclekM7urdRnUktr', 'recxoVftisPeg7LYX', 'recZk2SwrJXtoeTW8']
 app.use(express.static(path.join(__dirname, 'client/build')));
 let deptArray = [['CCH9-STICU', prodDepartmentID[0]], ['Main1-ED', prodDepartmentID[1]],
 ['CCH11-MRICU', prodDepartmentID[2]], ['CCH11-NSICU', prodDepartmentID[3]], ['N9-ICT', prodDepartmentID[4]],
@@ -35,59 +35,52 @@ departmentMap.get('key1') // returns "value1"
 
 app.post('/addNewStaff', (req, res) => {
   console.log("The request", req.body);
-  var Airtable = require('airtable');
-
-
-  var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY }).base(process.env.REACT_APP_API_AIRTABLE_BASE);
-  console.log(base);
-  console.log(base);
-  let buildingFloorUnit = departmentMap.get(req.body.department);
-  if(buildingFloorUnit != null){
-    base('Staff').create([
-      {
-        "fields": {
-          "Name": req.body.lastname + ", " + req.body.firstname,
-          "Email": req.body.email,
-          "Phone Number": req.body.textmask,
-          "Building/Floor/Unit": [
-            buildingFloorUnit
-          ],
-          "Staff Barcode": { "text": req.body.barcode},
-        }
-      }
-    ], function (err, records) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      records.forEach(function (record) {
-        console.log(record.getId());
-      });
-      res.status(200).send({ message: 'Success!', severity: 'success' });
-    });
+  const airtable = new AirtablePlus({
+    baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
+    apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
+    tableName: 'Staff',
+  });
+  if (req.body.barcode == '') {
+    res.status(200).send({ message: 'Must scan a barcode', severity: 'warning' });
   } else {
-    base('Staff').create([
-      {
-        "fields": {
-          "Name": req.body.lastname + ", " + req.body.firstname,
-          "Email": req.body.email,
-          "Phone Number": req.body.textmask,
-          "Staff Barcode": { "text": req.body.barcode},
-        }
-      }
-    ], function (err, records) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      records.forEach(function (record) {
-        console.log(record.getId());
-      });
-      res.status(200).send({ message: 'Success!', severity: 'success' });
-    });
-  }
+    (async () => {
+      try {
   
-
+        console.log(req.body);
+        const staffRes = await airtable.read({
+          filterByFormula: `{Staff Barcode} = "${req.body.barcode}"`
+        });
+  
+  
+        if (staffRes.length === 1) {
+          res.status(200).send({ message: 'User already exists', severity: 'warning' });
+        } else {
+          let buildingFloorUnit = departmentMap.get(req.body.department);
+          if(buildingFloorUnit != null) {
+            await airtable.create({
+              "Name": req.body.lastname + ", " + req.body.firstname,
+              "Email": req.body.email,
+              "Phone Number": req.body.textmask,
+              "Building/Floor/Unit": [
+                buildingFloorUnit
+              ],
+              "Staff Barcode": { "text": req.body.barcode },
+            })
+          } else {
+            await airtable.create({
+              "Name": req.body.lastname + ", " + req.body.firstname,
+              "Email": req.body.email,
+              "Phone Number": req.body.textmask,
+              "Staff Barcode": { "text": req.body.barcode },
+            })
+          }
+          res.status(200).send({ message: 'Success!', severity: 'success' });
+        }
+      } catch (e) {
+      console.error(e);
+    }
+  })();
+  }
 });
 
 app.post('/getStaffInformation', (req, res) => {
@@ -136,8 +129,6 @@ app.post('/updateStaff', (req, res) => {
     tableName: 'Staff',
   });
 
-
-
   (async () => {
     try {
 
@@ -158,7 +149,7 @@ app.post('/updateStaff', (req, res) => {
       let buildingFloorUnit = departmentMap.get(req.body.department);
       console.log(buildingFloorUnit)
       let updateRes = '';
-      if(buildingFloorUnit != null){
+      if (buildingFloorUnit != null) {
         updateRes = await airtable.update(staffRes[0].id, {
           "Name": req.body.lastname + ", " + req.body.firstname,
           "Email": req.body.email,
@@ -174,7 +165,7 @@ app.post('/updateStaff', (req, res) => {
           "Phone Number": req.body.textmask,
         });
       }
-      
+
       console.log("success")
 
       res.status(200).send({ message: 'Success!', severity: 'success', data: updateRes });
@@ -186,7 +177,7 @@ app.post('/updateStaff', (req, res) => {
   })();
 })
 
-app.post('/getMaskInformation', (req, res) =>{
+app.post('/getMaskInformation', (req, res) => {
   const airtable = new AirtablePlus({
     baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
     apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
@@ -221,57 +212,48 @@ app.post('/getMaskInformation', (req, res) =>{
 })
 app.post('/addNewMask', (req, res) => {
   console.log("The request", req.body);
-  var Airtable = require('airtable');
-  // console.log(process.env);
-  var base = new Airtable({ apiKey: process.env.REACT_APP_API_AIRTABLE_KEY }).base(process.env.REACT_APP_API_AIRTABLE_BASE);
-
-  let unitCode = departmentMap.get(req.body.department);
-  if(unitCode != null){
-    base('Masks').create([
-      {
-        "fields": {
-          "Mask Barcode": { "text": req.body.mask_barcode, "type": "" },
-          "Mask Type": req.body.mask_type,
-          "Unit Code": [unitCode],
-          "Sterilize Cycles": 0,
-        }
-      }
-    ], function (err, records) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      records.forEach(function (record) {
-        console.log(record.getId());
-      });
-      console.log("success")
-  
-      res.status(200).send({ message: 'Success!', severity: 'success' });
-    });
+  const airtable = new AirtablePlus({
+    baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
+    apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
+    tableName: 'Masks',
+  });
+  if (req.body.mask_barcode == '') {
+    res.status(200).send({ message: 'Must scan a barcode', severity: 'warning' });
   } else {
-    base('Masks').create([
-      {
-        "fields": {
-          "Mask Barcode": { "text": req.body.mask_barcode, "type": "" },
-          "Mask Type": req.body.mask_type,
-          "Sterilize Cycles": 0,
+    (async () => {
+      try {
+  
+        console.log(req.body);
+        const maskRes = await airtable.read({
+          filterByFormula: `{Mask Barcode} = "${req.body.mask_barcode}"`
+        });
+  
+  
+        if (maskRes.length === 1) {
+          res.status(200).send({ message: 'Mask already exists', severity: 'warning' });
+        } else {
+          let unitCode = departmentMap.get(req.body.department);
+          if(unitCode != null) {
+            await airtable.create({
+              "Mask Barcode": { "text": req.body.mask_barcode, "type": "" },
+              "Mask Type": req.body.mask_type,
+              "Unit Code": [unitCode],
+              "Sterilize Cycles": 0,
+            })
+          } else {
+            await airtable.create({
+              "Mask Barcode": { "text": req.body.mask_barcode, "type": "" },
+              "Mask Type": req.body.mask_type,
+              "Sterilize Cycles": 0,
+            })
+          }
+          res.status(200).send({ message: 'Success!', severity: 'success' });
         }
-      }
-    ], function (err, records) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      records.forEach(function (record) {
-        console.log(record.getId());
-      });
-      console.log("success")
-  
-      res.status(200).send({ message: 'Success!', severity: 'success' });
-    });
+      } catch (e) {
+      console.error(e);
+    }
+  })();
   }
-  
-
 });
 
 
@@ -299,8 +281,8 @@ app.post('/updateMask', (req, res) => {
       console.log(maskRes)
       console.log(maskRes[0].fields['Status'])
       if (maskRes[0].fields['Sterilization Alert'] != null) {
-          console.log("STERILIZATION NOT EMPTY")
-          res.status(200).send({ message: 'Mask has reached MAX cycle use. Please destroy mask', severity: 'error' });
+        console.log("STERILIZATION NOT EMPTY")
+        res.status(200).send({ message: 'Mask has reached MAX cycle use. Please destroy mask', severity: 'error' });
       }
 
 
@@ -321,7 +303,7 @@ app.post('/updateMask', (req, res) => {
         }
         let unit = departmentMap.get(req.body.department);
         console.log(unit)
-        if(unit != null){
+        if (unit != null) {
           const updateRes = await airtable.update(maskRes[0].id, {
             'Unit Code': [unit],
             'Sterilize Cycles': maskRes[0].fields['Sterilize Cycles'] + cycle
