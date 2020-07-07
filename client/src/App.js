@@ -31,11 +31,6 @@ const styles = {
     margin: '0 auto',
     borderRadius: '25px',
     boxShadow: 'none',
-    // palette:  { 
-    //   text: {
-    //       primary: "#ffffff",
-    //   }
-    // }
 
   },
   appBar: {
@@ -44,7 +39,8 @@ const styles = {
   }
 };
 const useStyles = makeStyles(styles);
-
+//creates a card for each option for a user to pick
+//add mask, add user, update mask, update user, assign mask
 export const MaterialGrid = () => {
   const classes = useStyles();
   const history = useHistory();
@@ -93,6 +89,7 @@ export const MaterialGrid = () => {
 
 class App extends React.Component {
   render() {
+    //routing for each card a user selects
     return (
       <Router>
         <Switch>

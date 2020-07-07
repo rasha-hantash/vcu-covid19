@@ -22,6 +22,7 @@ import CenterFocusWeakOutlinedIcon from '@material-ui/icons/CenterFocusWeakOutli
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import MuiAlert from '@material-ui/lab/Alert';
 
+//set up for the snack bar alert
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -86,12 +87,12 @@ class AddMask extends React.Component {
         this.addNewMask = this.addNewMask.bind(this);
         this.backToMain = this.backToMain.bind(this);
     }
-
+    //begins scan fo a barcode
     _scan = () => {
         this.state.lastresult= [];
         this.setState({ scanning: !this.state.scanning })
     }
-
+    //will begin logging barcode when it detects it 
     _onDetected = result => {
 
         this.state.lastresult.push(result.codeResult.code);
@@ -103,6 +104,7 @@ class AddMask extends React.Component {
 
         }
     }
+    //logs results of the barcode
     _logResults = () => {
         console.log("This is your result ", this.state.lastresult)
         let code = this._orderByOccurance(this.state.lastresult)[0];
@@ -125,7 +127,7 @@ class AddMask extends React.Component {
         });
     }
 
-
+    //updates the state of the mask form depending on user input
     handleChange = (event) => {
         this.setState({
             ...this.state,
@@ -151,6 +153,7 @@ class AddMask extends React.Component {
             message,
             open
         };
+        //calls on the node.js endpoint to add a new mask
         let response = await axios.post('/addNewMask', maskInformation);
         this.state.message = response.data.message;
         this.state.severity = response.data.severity;
@@ -164,6 +167,7 @@ class AddMask extends React.Component {
         }
 
     }
+    //closes the snackbar 
     handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -177,6 +181,8 @@ class AddMask extends React.Component {
     }
 
     render() {
+      // Step 1 : Let the user edit the information that was added to the screen
+      // Step 2 : When they submit the new information it will be sent to Airtable
         const { classes } = this.props;
         return (
             <Container className={classes.marginAutoContainer}>
@@ -197,7 +203,6 @@ class AddMask extends React.Component {
                         name="mask_barcode"
                         value={this.state.mask_barcode}
                         onChange={event => this.handleChange(event)}
-                        // style={{ width: "40%", marginBottom: "1%" }}
                         placeholder="Scan Mask Barcode" label="Required"
                         InputProps={{
                             endAdornment: <InputAdornment position="end"><IconButton onClick={this._scan}><CenterFocusWeakOutlinedIcon>

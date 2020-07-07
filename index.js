@@ -4,21 +4,16 @@ const generatePassword = require('password-generator');
 
 const app = express();
 
-// const dotenv = require('dotenv');
-// dotenv.config();
 require('dotenv').config();
-// Object.prototype.getKey = function(value) {
-//         var object = this;
-//         console.log('get key')
-//         return Object.keys(object).find(key => object[key] === value);
-//       };
 const AirtablePlus = require('airtable-plus');
 var cors = require('cors');
 app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
 // Serve static files from the React app
+// devDepartmentID is used for testing Airtable dev environment
 let devDepartmentID = ['recPOMw3GCT2Dc8vC', 'recHcQSjdezz7FtHk', 'recI4EIhOKndHhz3w', 'recAu5jA3PcLq0pWx', 'recrFpcqSXuEVqWwc',
   'recQx8umaexJhpRkf', 'rec2HJXIYf96aCiPL', 'recuDQAL7whliJqNW']
 let prodDepartmentID = ['reckvYOO0PzaJHBEO', 'reccT2a4xrfHdaWQw', 'recdLQ028X3lNM2cI', 'rec5bhBln2STwvS5J', 'recWmBubcaaM1VpFo',
@@ -31,7 +26,6 @@ let deptArray = [['CCH9-STICU', prodDepartmentID[0]], ['Main1-ED', prodDepartmen
 // Use the regular Map constructor to transform a 2D key-value Array into a map
 let departmentMap = new Map(deptArray)
 
-departmentMap.get('key1') // returns "value1"
 
 app.post('/addNewStaff', (req, res) => {
   console.log("The request", req.body);
@@ -40,6 +34,8 @@ app.post('/addNewStaff', (req, res) => {
     apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
     tableName: 'Staff',
   });
+
+  //requires user to scan a barcode
   if (req.body.barcode == '') {
     res.status(200).send({ message: 'Must scan a barcode', severity: 'warning' });
   } else {
@@ -51,11 +47,15 @@ app.post('/addNewStaff', (req, res) => {
           filterByFormula: `{Staff Barcode} = "${req.body.barcode}"`
         });
   
-  
+        //checks to see if staff member with the barcode already exists
+        //if they do then send a warning
         if (staffRes.length === 1) {
           res.status(200).send({ message: 'User already exists', severity: 'warning' });
         } else {
           let buildingFloorUnit = departmentMap.get(req.body.department);
+
+          //adding a staff member
+          //checking to see if buildingFloorUnit is included in the form
           if(buildingFloorUnit != null) {
             await airtable.create({
               "Name": req.body.lastname + ", " + req.body.firstname,
@@ -84,13 +84,13 @@ app.post('/addNewStaff', (req, res) => {
 });
 
 app.post('/getStaffInformation', (req, res) => {
+
+  //create a connection to Airtable base and connect to the Staff table
   const airtable = new AirtablePlus({
     baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
     apiKey: process.env.REACT_APP_API_AIRTABLE_KEY,
     tableName: 'Staff',
   });
-
-
 
   (async () => {
     try {
@@ -100,7 +100,7 @@ app.post('/getStaffInformation', (req, res) => {
         filterByFormula: `{Staff Barcode} = "${req.body.barcode}"`
       });
 
-
+      //check to see if staff member exists
       if (staffRes.length === 0) {
         console.log("here not found");
         res.status(200).send({ message: 'User not found', severity: 'warning' });
@@ -109,10 +109,8 @@ app.post('/getStaffInformation', (req, res) => {
         console.log(role);
       }
 
-
-      // console.log("department key", departmentMap.getKey("recPOMw3GCT2Dc8vC"))
+      //send back staff information
       console.log(staffRes[0].fields['Building/Floor/Unit'][0])
-      // console.log("get key by value", getKeyByValue(departmentMap, "recPOMw3GCT2Dc8vC"))
       console.log("this is staff res", staffRes)
       res.status(200).send({ message: 'Success!', severity: 'success', staffInfo: staffRes });
 
@@ -122,6 +120,8 @@ app.post('/getStaffInformation', (req, res) => {
     }
   })();
 })
+
+
 app.post('/updateStaff', (req, res) => {
   const airtable = new AirtablePlus({
     baseID: process.env.REACT_APP_API_AIRTABLE_BASE,
@@ -137,7 +137,7 @@ app.post('/updateStaff', (req, res) => {
         filterByFormula: `{Staff Barcode} = "${req.body.barcode}"`
       });
 
-
+      //check to see if staff member exists
       if (staffRes.length === 0) {
         console.log("here not found");
         res.status(200).send({ message: 'User not found', severity: 'warning' });
@@ -145,6 +145,7 @@ app.post('/updateStaff', (req, res) => {
 
       console.log("this is staffres", staffRes)
       console.log("department", staffRes[0].fields['Building/Floor/Unit'])
+
       // TODO: be able to grab value from departmentMap to update form
       let buildingFloorUnit = departmentMap.get(req.body.department);
       console.log(buildingFloorUnit)
@@ -194,7 +195,7 @@ app.post('/getMaskInformation', (req, res) => {
         filterByFormula: `{Mask Barcode} = "${req.body.mask_barcode}"`
       });
 
-
+      //checks to see if mask exists
       if (maskRes.length === 0) {
         console.log("here not found");
         res.status(200).send({ message: 'Mask not found', severity: 'warning' });
@@ -202,6 +203,8 @@ app.post('/getMaskInformation', (req, res) => {
       for (let role of departmentMap.values()) {
         console.log(role);
       }
+
+      //return infomation of that mask
       res.status(200).send({ message: 'Success!', severity: 'success', maskInfo: maskRes });
 
     }
@@ -228,7 +231,7 @@ app.post('/addNewMask', (req, res) => {
           filterByFormula: `{Mask Barcode} = "${req.body.mask_barcode}"`
         });
   
-  
+        //checks to see if mask exists
         if (maskRes.length === 1) {
           res.status(200).send({ message: 'Mask already exists', severity: 'warning' });
         } else {
@@ -241,12 +244,14 @@ app.post('/addNewMask', (req, res) => {
               "Sterilize Cycles": 0,
             })
           } else {
+            //adds the new mask to airtable
             await airtable.create({
               "Mask Barcode": { "text": req.body.mask_barcode, "type": "" },
               "Mask Type": req.body.mask_type,
               "Sterilize Cycles": 0,
             })
           }
+
           res.status(200).send({ message: 'Success!', severity: 'success' });
         }
       } catch (e) {
@@ -360,7 +365,7 @@ app.post('/assignMaskToUser', (req, res) => {
         res.status(200).send({ message: 'Mask not found', severity: 'warning' });
       }
 
-      const updateRes = await airtable.update(maskRes[0].id, {
+      await airtable.update(maskRes[0].id, {
         'Owner': [staffRes[0].id]
       }, cfg);
       console.log("success")
@@ -372,12 +377,6 @@ app.post('/assignMaskToUser', (req, res) => {
     }
   })();
 })
-
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname + '/client/build/index.html'));
-// });
 
 const port = process.env.PORT || 5005;
 app.listen(port);

@@ -84,12 +84,15 @@ class AssignMask extends React.Component {
         this.assignMask = this.assignMask.bind(this);
     }
 
+    //clears out any previous scans
+    //opens camera for the scan
     _scan = (barcode) => {
         this.state.lastresult= [];
         this.setState({ scanning: !this.state.scanning })
         this.setState({ type: barcode })
     }
 
+    //logs any detected bar code scans
     _onDetected = result => {
 
         this.state.lastresult.push(result.codeResult.code);
@@ -101,6 +104,9 @@ class AssignMask extends React.Component {
 
         }
     }
+
+    //logs the results of the barcode scan and determines if the barcode is of
+    //type mask or staff
     _logResults = () => {
         console.log("This is your result ", this.state.lastresult)
         let code = this._orderByOccurance(this.state.lastresult)[0];
@@ -142,6 +148,7 @@ class AssignMask extends React.Component {
         this.props.history.push('/');
     }
 
+    //assigns mask to a staff member
     async assignMask() {
 
         const { mask_barcode,
@@ -170,7 +177,6 @@ class AssignMask extends React.Component {
         this.setState({ ...this.state, open: true });
 
         if (response) {
-            // const type = await response.json();
             console.log('Login status:');
 
         } else {
@@ -215,7 +221,6 @@ class AssignMask extends React.Component {
                         name="staff_barcode"
                         value={this.state.staff_barcode}
                         onChange={event => this.handleChange(event)}
-                        // style={{ width: "40%", marginBottom: "1%" }}
                         placeholder="Scan Staff Barcode" label="Required"
                         InputProps={{
                             endAdornment: <InputAdornment position="end"><IconButton onClick={() => this._scan('staff')}><CenterFocusWeakOutlinedIcon>
@@ -236,7 +241,6 @@ class AssignMask extends React.Component {
                         name="mask_barcode"
                         value={this.state.mask_barcode}
                         onChange={event => this.handleChange(event)}
-                        // style={{ width: "40%", marginBottom: "1%" }}
                         placeholder="Scan Mask Barcode" label="Required"
                         InputProps={{
                             endAdornment: <InputAdornment position="end"><IconButton onClick={() => this._scan('mask')}><CenterFocusWeakOutlinedIcon>

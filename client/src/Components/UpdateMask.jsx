@@ -208,6 +208,7 @@ class UpdateMask extends React.Component {
             message,
             open
         };
+        //if user selects destroy mask but doesnt select a reason return a message
         let missingReason = false;
         console.log("Mask information", maskInformation)
         if (maskInformation.destroy) {
@@ -220,6 +221,7 @@ class UpdateMask extends React.Component {
                 missingReason = true;
             }
         } if (!maskInformation.destroy) {
+            // if user selects reason to destroy mask but does not select Destroy mask send a message
             if (maskInformation.soiled || maskInformation.damaged || maskInformation.maxUse) {
                 this.state.severity = "error"
                 this.state.message = "Please select Destroy Mask if you intend to destroy the mask"
@@ -236,7 +238,7 @@ class UpdateMask extends React.Component {
             if (maskInformation.maxUse) {
                 maskInformation.destroyReason = "Max Use"
             }
-
+            //otherwise update the mask
             let response = await axios.post('/updateMask', maskInformation);
             this.state.message = response.data.message;
             this.state.severity = response.data.severity;
@@ -247,6 +249,8 @@ class UpdateMask extends React.Component {
         }
 
     }
+
+    // closes snackbar if user clicks away
     handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;

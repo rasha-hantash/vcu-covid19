@@ -26,11 +26,12 @@ import { withRouter } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import MuiAlert from '@material-ui/lab/Alert';
 
+//set up for creating a snackbar alert
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-
+//styling for 
 const styles = theme => ({
   marginAutoContainer: {
     height: "50%",
@@ -50,9 +51,6 @@ const styles = theme => ({
     backgroundColor: 'pink',
   },
   root: {
-    // '& .MuiTextField-root': {
-    //   margin: theme.spacing(1),
-    // },
 
     marginTop: '1em',
     marginBottom: '1em',
@@ -78,7 +76,8 @@ const styles = theme => ({
 });
 
 
-
+//allow user to type in their phone number
+//formats as (123)-456-7109
 function TextMaskCustom(props) {
   const { inputRef, ...other } = props;
 
@@ -122,12 +121,13 @@ class AddStaff extends React.Component {
   }
 
 
-
+  //clears out previously scanned bar code
   _scan = () => {
     this.state.lastresult= [];
     this.setState({ scanning: !this.state.scanning })
   }
 
+  //begins scan and then logs
   _onDetected = result => {
 
     this.state.lastresult.push(result.codeResult.code);
@@ -139,6 +139,8 @@ class AddStaff extends React.Component {
 
     }
   }
+
+  //logs all the results of barcodes and then calls _orderByOccurance
   _logResults = () => {
     console.log("This is your result ", this.state.lastresult)
     let code = this._orderByOccurance(this.state.lastresult)[0];
@@ -198,23 +200,24 @@ class AddStaff extends React.Component {
       open
     };
 
+    // calls to create a new staff member
     let response = await axios.post('/addNewStaff', staffInformation);
-    // console.log("MESSAGE!!!!",response.data.message);
     this.state.message = response.data.message;
     this.state.severity = response.data.severity;
     this.setState({ ...this.state, open: true });
 
     if (response) {
-      console.log('Login status:');
+      console.log('Success:');
 
     } else {
-      console.error('Login Failed!');
+      console.error('Failed!');
     }
 
     console.log("These are records", this.state.records);
 
   }
 
+  //closes the snack bar
   handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -228,6 +231,8 @@ class AddStaff extends React.Component {
   }
 
   render() {
+    // Step 1 : Let the user edit the information that was added to the screen
+    // Step 2 : When they submit the new information it will be sent to Airtable
     const { classes } = this.props;
     console.log(this.props);
     console.log(this.state);
@@ -254,7 +259,6 @@ class AddStaff extends React.Component {
             id="standard-full-width"
             name="firstname"
             onChange={event => this.handleChange(event)}
-            // style={{ marginBottom: "1%", marginLeft: "2%" }}
             placeholder="Enter First"
             label="Required"
             InputLabelProps={{
@@ -266,7 +270,6 @@ class AddStaff extends React.Component {
             id="standard-full-width"
             name="lastname"
             onChange={event => this.handleChange(event)}
-            // style={{ marginBottom: "1%", marginLeft: "2%" }}
             placeholder="Enter Last Name"
             label="Required"
             InputLabelProps={{
@@ -278,7 +281,6 @@ class AddStaff extends React.Component {
             id="standard-full-width"
             name="email"
             onChange={event => this.handleChange(event)}
-            // style={{ width: "40%", marginBottom: "1%" }}
             placeholder="Enter email"
             label="Required"
             InputLabelProps={{
@@ -291,7 +293,6 @@ class AddStaff extends React.Component {
             name="barcode"
             value={this.state.barcode}
             onChange={event => this.handleChange(event)}
-            // style={{ width: "40%", marginBottom: "1%" }}
             placeholder="Scan Staff Barcode" label="Required"
             InputProps={{
               endAdornment: <InputAdornment position="end"><IconButton onClick={this._scan}><CenterFocusWeakOutlinedIcon>
@@ -314,10 +315,7 @@ class AddStaff extends React.Component {
             onChange={event => this.handleChange(event)}
             labelId="demo-simple-select-placeholder-label-label"
             id="demo-simple-select-placeholder-label"
-            // value={Phone}
-            // onChange={this.handlePhoneChange}
             displayEmpty
-          // className={classes.selectEmpty}
 
           >
             <MenuItem value="">
@@ -332,10 +330,8 @@ class AddStaff extends React.Component {
             <MenuItem value={"ACC-OR"}>ACC-OR</MenuItem>
             <MenuItem value={"ACC-Anesthesia"}>ACC-Anesthesia</MenuItem>
           </Select>
-          {/* <FormHelperText>Label + placeholder</FormHelperText> */}
         </FormControl>
         <form noValidate autoComplete="off">
-          {/* <InputLabel required shrink id="demo-simple-select-placeholder-label-label">Department</InputLabel> */}
           <InputLabel required  >Phone number</InputLabel>
           <Input className={classes.root}
             value={this.state.textmask}
@@ -343,7 +339,6 @@ class AddStaff extends React.Component {
             name="textmask"
             id="formatted-text-mask-input"
             inputComponent={TextMaskCustom}
-          // style={{ width: "40%", marginBottom: "1%" }}
           />
         </form>
         <Button className={classes.root} style={{ marginTop: "1%", color: "black", backgroundColor: "#FFBA00", border: "none" }} color="primary" variant="outlined" onClick={this.addNewStaff.bind(this)}>Add Staff</Button>

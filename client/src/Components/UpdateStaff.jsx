@@ -146,7 +146,6 @@ class UpdateStaff extends React.Component {
 
     this.setState({ ...this.state, firstname:fullname[1].trim() })
     this.setState({ ...this.state, lastname: fullname[0].trim()  })
-    // this.setState({...this.state, email: response.data.staffInfo[0].fields['Email'] })
     this.setState({ ...this.state, textmask: response.data.staffInfo[0].fields['Phone Number'] })
     console.log(this.state)
 
